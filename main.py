@@ -8,9 +8,16 @@ class Player:
     def __init__(self, image, height, speed, health, max_health):
         self.speed = speed
         self.image = image
+        self.flip_image = pygame.transform.flip(image, True, False)
         self.pos = image.get_rect().move(0, height)
         self.health = health
         self.max_health = max_health
+        self.arc_active = False
+        self.arc_start_time = 0
+        self.arc_duration = 500
+        self.arc_color = (255, 255, 255)
+        self.arc_rect = pygame.Rect(0, 0, self.pos[2], self.pos[3])
+        self.facing = 1
 
     def move(self, up=False, down=False, left=False, right=False):
         if right:
@@ -36,6 +43,33 @@ class Player:
             print(f"Player health is {self.health}")
         else:
             print("Player health is 0!")
+
+    def basic_attack(self, surface):
+        if not self.arc_active:
+            self.arc_active = True
+            self.arc_start_time = pygame.time.get_ticks()
+
+        self.draw_arc(surface)
+
+    def draw_arc(self, surface):
+        offset = 25
+        center = (self.pos.centerx + offset, self.pos.centery)
+        radius = 50
+        start_angle = -math.pi / 2
+        end_angle = math.pi / 2
+        pygame.draw.arc(
+            surface,
+            self.arc_color,
+            (center[0] - radius, center[1] - radius, radius * 2, radius * 2),
+            start_angle,
+            end_angle,
+            width=5,
+        )
+
+    def update(self):
+        current_time = pygame.time.get_ticks()
+        if self.arc_active and (current_time - self.arc_start_time > self.arc_duration):
+            self.arc_active = False
 
 
 class Enemy:
@@ -63,7 +97,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-    player = pygame.image.load("player.png").convert()
+    player = pygame.image.load("player.png").convert_alpha()
     background = pygame.image.load("grass.jpg").convert()
     screen.blit(background, (0, 0))
 
@@ -86,10 +120,18 @@ def main():
 
     damage_tick = 0
     damaged = False
+
+    attack_cooldown = 0
+    on_cooldown = False
+
     while running:
         if damage_tick > 100:
             damaged = False
             damage_tick = 0
+
+        if attack_cooldown > 100:
+            on_cooldown = False
+            attack_cooldown = 0
 
         target = p.pos
         screen.blit(background, p.pos, p.pos)
@@ -123,13 +165,23 @@ def main():
             p.move(down=True)
         if keys[pygame.K_a]:
             p.move(left=True)
+            p.image = p.flip_image
         if keys[pygame.K_d]:
             p.move(right=True)
+            p.image = player
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    p.basic_attack(screen)
+                    print("Player attacks")
+                    on_cooldown = True
 
+        p.update()
+
+        screen.blit(background, (0, 0))
         screen.blit(p.image, p.pos)
 
         for o in objects:
@@ -139,11 +191,18 @@ def main():
                 damaged = True
             screen.blit(o.image, o.pos)
 
+        if damaged:
+            damage_tick += 1
+
+        if on_cooldown:
+            attack_cooldown += 1
+
+        if p.arc_active:
+            p.draw_arc(screen)
+
         pygame.display.update()
 
         clock.tick(60)
-        if damaged:
-            damage_tick += 1
     pygame.quit()
 
 
