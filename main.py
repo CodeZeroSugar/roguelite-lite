@@ -1,7 +1,7 @@
 import pygame
 import math
 import random
-from constants import *
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_HEIGHT, SPRITE_WIDTH
 
 
 class Player:
@@ -14,7 +14,7 @@ class Player:
         self.max_health = max_health
         self.arc_active = False
         self.arc_start_time = 0
-        self.arc_duration = 500
+        self.arc_duration = 300
         self.arc_color = (255, 255, 255)
         self.arc_rect = pygame.Rect(0, 0, self.pos[2], self.pos[3])
         self.facing = 1
@@ -53,11 +53,16 @@ class Player:
 
     def draw_arc(self, surface):
         offset = 25
-        center = (self.pos.centerx + offset, self.pos.centery)
         radius = 50
-        start_angle = -math.pi / 2
-        end_angle = math.pi / 2
-        pygame.draw.arc(
+        if self.image == self.flip_image:
+            center = (self.pos.centerx - offset, self.pos.centery)
+            start_angle = math.pi / 2
+            end_angle = -math.pi / 2
+        else:
+            center = (self.pos.centerx + offset, self.pos.centery)
+            start_angle = -math.pi / 2
+            end_angle = math.pi / 2
+        return pygame.draw.arc(
             surface,
             self.arc_color,
             (center[0] - radius, center[1] - radius, radius * 2, radius * 2),
@@ -73,9 +78,10 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, image, speed):
+    def __init__(self, image, speed, health):
         self.speed = speed
         self.image = image
+        self.health = health
         self.pos = image.get_rect()
 
     def move_toward(self, target):
@@ -87,6 +93,13 @@ class Enemy:
             dy /= distance
             self.pos[0] += dx * self.speed
             self.pos[1] += dy * self.speed
+
+    def take_damage(self):
+        if self.health > 0:
+            self.health -= 2
+            print(f"Enemy health is {self.health}")
+        else:
+            print("Enemy health is 0!")
 
 
 def main():
@@ -112,7 +125,7 @@ def main():
 
     objects = []
     for x in range(5):
-        o = Enemy(player, 2)
+        o = Enemy(player, 2, 5)
         o.pos[0] = random.randint(0, SCREEN_WIDTH - 20)
         o.pos[1] = random.randint(0, SCREEN_WIDTH - 20)
         objects.append(o)
@@ -174,7 +187,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE and not on_cooldown:
                     p.basic_attack(screen)
                     print("Player attacks")
                     on_cooldown = True
@@ -184,11 +197,17 @@ def main():
         screen.blit(background, (0, 0))
         screen.blit(p.image, p.pos)
 
+        if p.arc_active:
+            arc_rect = p.draw_arc(screen)
+
         for o in objects:
             o.move_toward(target)
             if o.pos.colliderect(p.pos) and damage_tick == 0:
                 p.take_damage()
                 damaged = True
+            if p.arc_active:
+                if o.pos.colliderect(arc_rect) and not on_cooldown:
+                    o.take_damage()
             screen.blit(o.image, o.pos)
 
         if damaged:
@@ -196,9 +215,6 @@ def main():
 
         if on_cooldown:
             attack_cooldown += 1
-
-        if p.arc_active:
-            p.draw_arc(screen)
 
         pygame.display.update()
 
