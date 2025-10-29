@@ -18,6 +18,19 @@ class Player:
         self.arc_color = (255, 255, 255)
         self.arc_rect = pygame.Rect(0, 0, self.pos[2], self.pos[3])
         self.facing = 1
+        self.hit_enemies = []
+        self.attack_hitbox = pygame.Rect(0, 0, 80, 60)
+        # slash animation
+        self.slash_sheet = pygame.image.load(
+            "./animations/slash/sprite-sheet.png"
+        ).convert_alpha()
+        self.slash_frames = 9
+        self.slash_w = 64
+        self.slash_h = 64
+        self.slash_index = 0
+        self.slash_active = False
+        self.slash_start = 0
+        self.slash_duration = 270
 
     def move(self, up=False, down=False, left=False, right=False):
         if right:
@@ -48,6 +61,7 @@ class Player:
         if not self.arc_active:
             self.arc_active = True
             self.arc_start_time = pygame.time.get_ticks()
+            self.hit_enemies = []
 
         self.draw_arc(surface)
 
@@ -71,10 +85,40 @@ class Player:
             width=5,
         )
 
+    def start_slash(self):
+        """Call this when the player presses Space."""
+        if not self.slash_active:
+            self.slash_active = True
+            self.slash_start = pygame.time.get_ticks()
+            self.slash_index = 0
+            self.hit_enemies = []
+
     def update(self):
         current_time = pygame.time.get_ticks()
-        if self.arc_active and (current_time - self.arc_start_time > self.arc_duration):
-            self.arc_active = False
+        # slash animation
+        if self.slash_active:
+            elapsed = current_time - self.slash_start
+            frame = int(elapsed * self.slash_frames / self.slash_duration)
+            frame = min(frame, self.slash_frames - 1)
+            self.slash_index = frame
+
+            if elapsed >= self.slash_duration:
+                self.slash_active = False
+
+        if self.facing == 1:
+            self.attack_hitbox.midleft = (self.pos.right - 10, self.pos.centery)
+        else:
+            self.attack_hitbox.midright = (self.pos.left + 10, self.pos.centery)
+        if self.arc_active:
+            offset = 35
+            if self.facing == 1:
+                self.attack_hitbox.midleft = (self.pos.right, self.pos.centery)
+            else:
+                self.attack_hitbox.midright = (self.pos.left, self.pos.centery)
+
+            if current_time - self.arc_start_time > self.arc_duration:
+                self.arc_active = False
+                self.hit_enemies = []
 
 
 class Enemy:
@@ -127,7 +171,7 @@ def main():
     for x in range(5):
         o = Enemy(player, 2, 5)
         o.pos[0] = random.randint(0, SCREEN_WIDTH - 20)
-        o.pos[1] = random.randint(0, SCREEN_WIDTH - 20)
+        o.pos[1] = random.randint(0, SCREEN_HEIGHT - 20)
         objects.append(o)
         print("Enemy spawned")
 
@@ -138,17 +182,59 @@ def main():
     on_cooldown = False
 
     while running:
-        if damage_tick > 100:
-            damaged = False
-            damage_tick = 0
+        # Player input
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            p.move(up=True)
+        if keys[pygame.K_s]:
+            p.move(down=True)
+        if keys[pygame.K_a]:
+            p.move(left=True)
+            p.image = p.flip_image
+            p.facing = -1
+        if keys[pygame.K_d]:
+            p.move(right=True)
+            p.image = player
+            p.facing = 1
 
-        if attack_cooldown > 100:
-            on_cooldown = False
-            attack_cooldown = 0
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not on_cooldown:
+                    p.basic_attack(screen)
+                    p.start_slash()
+                    print("Player attacks")
+                    on_cooldown = True
 
-        target = p.pos
-        screen.blit(background, p.pos, p.pos)
+        # Update logic
+        target = p.pos.center
+        p.update()
 
+        # Move enemies
+        for o in objects:
+            o.move_toward(target)
+
+        # Player damaged
+        for o in objects:
+            if o.pos.colliderect(p.pos) and damage_tick == 0:
+                p.take_damage()
+                damaged = True
+                damage_tick = 1
+
+        # Enemy damage
+        if p.arc_active:
+            p.draw_arc(screen)
+            for o in objects:
+                if o.pos.colliderect(p.attack_hitbox):
+                    if o not in p.hit_enemies:
+                        o.take_damage()
+                        p.hit_enemies.append(o)
+
+        # Draw
+        screen.blit(background, (0, 0))
+
+        # health bar
         health_ratio = p.health / p.max_health
         current_health_width = health_bar_width * health_ratio
 
@@ -167,54 +253,46 @@ def main():
                 health_bar_height,
             ),
         )
+        pygame.draw.rect(
+            screen,
+            (255, 255, 255),
+            (health_bar_pos[0], health_bar_pos[1], health_bar_width, health_bar_height),
+            2,
+        )
 
-        for o in objects:
-            screen.blit(background, o.pos, o.pos)
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]:
-            p.move(up=True)
-        if keys[pygame.K_s]:
-            p.move(down=True)
-        if keys[pygame.K_a]:
-            p.move(left=True)
-            p.image = p.flip_image
-        if keys[pygame.K_d]:
-            p.move(right=True)
-            p.image = player
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not on_cooldown:
-                    p.basic_attack(screen)
-                    print("Player attacks")
-                    on_cooldown = True
-
-        p.update()
-
-        screen.blit(background, (0, 0))
         screen.blit(p.image, p.pos)
 
-        if p.arc_active:
-            arc_rect = p.draw_arc(screen)
+        # slash
+        if p.slash_active:
+            src_rect = pygame.Rect(p.slash_index * p.slash_w, 0, p.slash_w, p.slash_h)
+            frame = p.slash_sheet.subsurface(src_rect)
+            if p.facing == -1:
+                frame = pygame.transform.flip(frame, True, False)
+            dst_rect = frame.get_rect()
+            offset = 18
+            if p.facing == 1:
+                dst_rect.midleft = (p.pos.right - offset, p.pos.centery)
+            else:
+                dst_rect.midright = (p.pos.left + offset, p.pos.centery)
+
+            screen.blit(frame, dst_rect)
 
         for o in objects:
-            o.move_toward(target)
-            if o.pos.colliderect(p.pos) and damage_tick == 0:
-                p.take_damage()
-                damaged = True
-            if p.arc_active:
-                if o.pos.colliderect(arc_rect) and not on_cooldown:
-                    o.take_damage()
             screen.blit(o.image, o.pos)
+
+        # Cooldowns
 
         if damaged:
             damage_tick += 1
+            if damage_tick > 30:
+                damage_tick = 0
+                damaged = False
 
         if on_cooldown:
             attack_cooldown += 1
+            if attack_cooldown > 30:
+                attack_cooldown = 0
+                on_cooldown = False
 
         pygame.display.update()
 
