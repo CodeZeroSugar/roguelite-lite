@@ -99,7 +99,7 @@ class Player:
         if self.slash_active:
             elapsed = current_time - self.slash_start
             frame = int(elapsed * self.slash_frames / self.slash_duration)
-            frame = min(frame, self.slash_frames - 1)
+            frame = max(0, min(frame, self.slash_frames - 1))
             self.slash_index = frame
 
             if elapsed >= self.slash_duration:
