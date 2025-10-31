@@ -9,7 +9,7 @@ class Player:
         self.speed = speed
         self.image = image
         self.flip_image = pygame.transform.flip(image, True, False)
-        self.pos = image.get_rect().move(0, height)
+        self.pos = image.get_rect().move(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.health = health
         self.max_health = max_health
         self.arc_active = False
@@ -123,8 +123,8 @@ class Player:
 
 class Enemy:
     def __init__(self, image, speed, health):
-        self.speed = speed
         self.image = image
+        self.speed = speed
         self.health = health
         self.pos = image.get_rect()
 
@@ -146,6 +146,43 @@ class Enemy:
             print("Enemy health is 0!")
 
 
+class EasyEnemy(Enemy):
+    def __init__(self):
+        self.health = 4
+        self.speed = 2
+        self.image = pygame.image.load("player.png").convert_alpha()
+        self.pos = self.image.get_rect()
+
+
+class MediumEnemy(Enemy):
+    def __init__(self):
+        self.health = 8
+        self.speed = 1
+        self.image = pygame.image.load("player.png").convert_alpha()
+        self.pos = self.image.get_rect()
+
+
+class HardEnemy(Enemy):
+    def __init__(self):
+        self.health = 20
+        self.speed = 0.5
+        self.image = pygame.image.load("player.png").convert_alpha()
+        self.pos = self.image.get_rect()
+
+
+def choose_enemy_type(elapsed_sec):
+    if elapsed_sec < 180:
+        return EasyEnemy
+    elif 180 <= elapsed_sec < 300:
+        return random.choice([EasyEnemy, MediumEnemy])
+    elif 300 <= elapsed_sec < 540:
+        return MediumEnemy
+    elif 540 <= elapsed_sec < 600:
+        return random.choice([EasyEnemy, MediumEnemy, HardEnemy])
+    else:
+        return None
+
+
 def main():
     print("Starting Roguelite-lite!")
     print(f"Screen width: {SCREEN_WIDTH}")
@@ -154,6 +191,20 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
+    running = True
+    play_game = False
+
+    title_background = pygame.image.load("./images/title_screen.png").convert()
+
+    # Title Screen
+    while running and not play_game:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                play_game = True
+        screen.blit(title_background, (0, 0))
+        pygame.display.flip()
+        clock.tick(60)
+
     player = pygame.image.load("player.png").convert_alpha()
     background = pygame.image.load("grass.jpg").convert()
     screen.blit(background, (0, 0))
@@ -165,15 +216,21 @@ def main():
     background_color = (255, 0, 0)
     health_color = (0, 255, 0)
 
-    running = True
+    # Font for timer
+    font = pygame.font.SysFont("Arial", 36, bold=True)
 
     objects = []
-    for x in range(5):
-        o = Enemy(player, 2, 5)
-        o.pos[0] = random.randint(0, SCREEN_WIDTH - 20)
-        o.pos[1] = random.randint(0, SCREEN_HEIGHT - 20)
-        objects.append(o)
-        print("Enemy spawned")
+    # for x in range(5):
+    #    o = EasyEnemy()
+    #    o.pos[0] = random.randint(0, SCREEN_WIDTH - 20)
+    #    o.pos[1] = random.randint(0, SCREEN_HEIGHT - 20)
+    #    objects.append(o)
+    #    print("Enemy spawned")
+
+    start_time = pygame.time.get_ticks()
+    last_spawn_time = start_time
+    spawn_interval = random.randint(2000, 5000)
+    ROUND_DURATION_MS = 600_000
 
     damage_tick = 0
     damaged = False
@@ -182,6 +239,27 @@ def main():
     on_cooldown = False
 
     while running:
+        current_time = pygame.time.get_ticks()
+        elapsed_ms = current_time - start_time
+        remaining_ms = max(0, ROUND_DURATION_MS - elapsed_ms)
+        elapsed_sec = elapsed_ms // 1000
+        remaining_sec = remaining_ms // 1000
+        # Round lasts 10 minutes
+        if remaining_ms <= 0:
+            print("Round over!")
+            running = False
+            continue
+        # Spawn logic
+        if current_time - last_spawn_time >= spawn_interval:
+            enemy_class = choose_enemy_type(elapsed_sec)
+            if enemy_class:
+                o = enemy_class()
+                o.pos[0] = random.randint(0, SCREEN_WIDTH - 20)
+                o.pos[1] = random.randint(0, SCREEN_HEIGHT - 20)
+                objects.append(o)
+                print(f"{enemy_class.__name__} spawned")
+            last_spawn_time = current_time
+
         # Player input
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
@@ -231,6 +309,9 @@ def main():
                         o.take_damage()
                         p.hit_enemies.append(o)
 
+        # Remove dead enemies
+        objects = [o for o in objects if o.health > 0]
+
         # Draw
         screen.blit(background, (0, 0))
 
@@ -279,6 +360,18 @@ def main():
 
         for o in objects:
             screen.blit(o.image, o.pos)
+
+        # Draw Timer
+        minutes = remaining_sec // 60
+        seconds = remaining_sec % 60
+        timer_text = f"{minutes:02d}:{seconds:02d}"
+        timer_surface = font.render(timer_text, True, (255, 255, 255))
+        timer_rect = timer_surface.get_rect()
+        timer_rect.topright = (SCREEN_WIDTH - 20, 20)
+        screen.blit(timer_surface, timer_rect)
+        bg_rect = timer_rect.inflate(20, 10)
+        pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
+        screen.blit(timer_surface, timer_rect)
 
         # Cooldowns
 
