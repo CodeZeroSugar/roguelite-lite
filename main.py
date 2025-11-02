@@ -220,12 +220,6 @@ def main():
     font = pygame.font.SysFont("Arial", 36, bold=True)
 
     objects = []
-    # for x in range(5):
-    #    o = EasyEnemy()
-    #    o.pos[0] = random.randint(0, SCREEN_WIDTH - 20)
-    #    o.pos[1] = random.randint(0, SCREEN_HEIGHT - 20)
-    #    objects.append(o)
-    #    print("Enemy spawned")
 
     start_time = pygame.time.get_ticks()
     last_spawn_time = start_time
