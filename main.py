@@ -9,24 +9,24 @@ class Player:
         self.speed = speed
         self.image = image
         self.flip_image = pygame.transform.flip(image, True, False)
-        self.pos = image.get_rect().move(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.pos = image.get_rect().move((SCREEN_WIDTH // 2), SCREEN_HEIGHT // 2)
+        self.hitbox = (image.get_rect()).scale_by(0.55, 0.75)
         self.health = health
         self.max_health = max_health
         self.arc_active = False
         self.arc_start_time = 0
         self.arc_duration = 300
         self.arc_color = (255, 255, 255)
-        self.arc_rect = pygame.Rect(0, 0, self.pos[2], self.pos[3])
         self.facing = 1
         self.hit_enemies = []
         self.attack_hitbox = pygame.Rect(0, 0, 80, 60)
         # slash animation
         self.slash_sheet = pygame.image.load(
-            "./animations/slash/sprite-sheet.png"
+            "./animations/slash/slash2_128x128.png"
         ).convert_alpha()
         self.slash_frames = 9
-        self.slash_w = 64
-        self.slash_h = 64
+        self.slash_w = 128
+        self.slash_h = 128
         self.slash_index = 0
         self.slash_active = False
         self.slash_start = 0
@@ -66,7 +66,7 @@ class Player:
         self.draw_arc(surface)
 
     def draw_arc(self, surface):
-        offset = 25
+        offset = 0
         radius = 50
         if self.image == self.flip_image:
             center = (self.pos.centerx - offset, self.pos.centery)
@@ -289,7 +289,7 @@ def main():
 
         # Player damaged
         for o in objects:
-            if o.pos.colliderect(p.pos) and damage_tick == 0:
+            if o.pos.colliderect(p.hitbox) and damage_tick == 0:
                 p.take_damage()
                 damaged = True
                 damage_tick = 1
@@ -308,6 +308,9 @@ def main():
 
         # Draw
         screen.blit(background, (0, 0))
+        pygame.draw.rect(screen, (255, 0, 0), p.pos, width=1)
+        pygame.draw.rect(screen, (255, 0, 0), p.hitbox.clamp(p.pos), width=1)
+        p.hitbox.center = p.pos.center
 
         # health bar
         health_ratio = p.health / p.max_health
