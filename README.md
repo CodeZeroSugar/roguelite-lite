@@ -1,0 +1,16 @@
+# Things to add
+- Powers to enhance player power
+- Enemy variety
+- Custom spawn timing versus random
+- More stages
+- Title screen
+- Sounds
+  - Player takes damage
+  - Enemy takes damage
+  - slashing sound
+  - ability sounds
+  - music
+  - player death sound
+  - enemy death sound
+  - victory sound
+  - defeat sound
