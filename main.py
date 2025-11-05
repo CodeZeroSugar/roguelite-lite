@@ -2,6 +2,7 @@ import pygame
 import random
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from classes import Player, EasyEnemy, MediumEnemy, HardEnemy
+from items import Food
 
 
 def choose_enemy_type(elapsed_sec):
@@ -50,6 +51,9 @@ def main():
     background_color = (255, 0, 0)
     health_color = (0, 255, 0)
 
+    # Initialize in game items
+    food_objects = []
+
     # Font for timer
     font = pygame.font.SysFont("Arial", 36, bold=True)
 
@@ -64,6 +68,8 @@ def main():
 
     damage_tick = 0
     damaged = False
+
+    create_food = False
 
     attack_cooldown = 0
     on_cooldown = False
@@ -139,12 +145,30 @@ def main():
                         o.take_damage()
                         p.hit_enemies.append(o)
 
-        # Remove dead enemies and increment score
+        # Increment score
         for o in objects:
             if o.health <= 0:
                 score_counter += 1
                 print(f"Score: {score_counter}")
+                create_food = True
 
+        # Food chance
+        if create_food is True:
+            print("Attempting to spawn food")
+            if random.randrange(1, 100) <= 80:
+                print("creating food!")
+                food_objects.append(Food())
+                print(f"Number of food on screen: {len(food_objects)}")
+                create_food = False
+
+        # Player eats food
+        for food in food_objects:
+            if food.food_rect.colliderect(p.hitbox):
+                print("Food Eaten")
+                food.get_eaten(p)
+                food_objects.remove(food)
+
+        # Remove dead enemies
         objects = [o for o in objects if o.health > 0]
 
         # Draw
@@ -196,6 +220,9 @@ def main():
 
             screen.blit(frame, dst_rect)
 
+        for food in food_objects:
+            screen.blit(food.image, food.food_rect)
+
         for o in objects:
             screen.blit(o.image, o.pos)
 
@@ -222,6 +249,7 @@ def main():
         screen.blit(score_surface, score_rect)
 
         # Cooldowns
+        create_food = False
 
         if damaged:
             damage_tick += 1
