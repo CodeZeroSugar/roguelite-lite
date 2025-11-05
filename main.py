@@ -166,7 +166,10 @@ def main():
             if food.food_rect.colliderect(p.hitbox):
                 print("Food Eaten")
                 food.get_eaten(p)
-                food_objects.remove(food)
+
+        food_objects = [
+            food for food in food_objects if not food.food_rect.colliderect(p.hitbox)
+        ]
 
         # Remove dead enemies
         objects = [o for o in objects if o.health > 0]
