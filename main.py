@@ -26,10 +26,13 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
+    pygame.mixer.music.load("./music/pixelated_carnage_1.mp3")
     running = True
     play_game = False
 
-    title_background = pygame.image.load("./images/title_screen.png").convert()
+    title_background = pygame.image.load(
+        "./backgrounds/dungeon_brick_wall_blue.png"
+    ).convert()
 
     # Title Screen
     while running and not play_game:
@@ -41,10 +44,12 @@ def main():
         clock.tick(60)
 
     player = pygame.image.load("player.png").convert_alpha()
-    background = pygame.image.load("grass.jpg").convert()
+    background = pygame.image.load(
+        "./backgrounds/dungeon_brick_wall_blue.png"
+    ).convert()
     screen.blit(background, (0, 0))
 
-    p = Player(player, 3, 10, 10)
+    p = Player(player, 3.0, 10, 10)
     health_bar_pos = (50, 35)
     health_bar_width = 200
     health_bar_height = 20
@@ -74,8 +79,14 @@ def main():
     attack_cooldown = 0
     on_cooldown = False
 
+    pygame.mixer.music.play()
+
     while running:
+        # Make sure tunes are playing
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.play()
         current_time = pygame.time.get_ticks()
+
         elapsed_ms = current_time - start_time
         remaining_ms = max(0, ROUND_DURATION_MS - elapsed_ms)
         elapsed_sec = elapsed_ms // 1000

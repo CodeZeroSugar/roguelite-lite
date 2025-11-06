@@ -1,5 +1,7 @@
 import pygame
 import math
+import os
+import random
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_HEIGHT, SPRITE_WIDTH
 
 
@@ -126,6 +128,9 @@ class Enemy:
         self.health = health
         self.pos = image.get_rect()
 
+    def get_random_sprite(self):
+        raise NotImplementedError("Children contain implementations")
+
     def move_toward(self, target):
         dx = target[0] - self.pos[0]
         dy = target[1] - self.pos[1]
@@ -147,22 +152,46 @@ class Enemy:
 class EasyEnemy(Enemy):
     def __init__(self):
         self.health = 4
-        self.speed = 2
-        self.image = pygame.image.load("player.png").convert_alpha()
+        self.speed = 2.0
+        self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
         self.pos = self.image.get_rect()
+
+    def get_random_sprite(self):
+        path_to_sprite = os.path.abspath("enemies/easy/")
+        sprites = []
+        for entry in os.listdir(path_to_sprite):
+            full_path = os.path.join(path_to_sprite, entry)
+            sprites.append(full_path)
+        return sprites[random.randrange(0, 2)]
 
 
 class MediumEnemy(Enemy):
     def __init__(self):
         self.health = 8
-        self.speed = 1
-        self.image = pygame.image.load("player.png").convert_alpha()
+        self.speed = 1.0
+        self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
         self.pos = self.image.get_rect()
+
+    def get_random_sprite(self):
+        path_to_sprite = os.path.abspath("enemies/medium/")
+        sprites = []
+        for entry in os.listdir(path_to_sprite):
+            full_path = os.path.join(path_to_sprite, entry)
+            sprites.append(full_path)
+        return sprites[random.randrange(0, 2)]
 
 
 class HardEnemy(Enemy):
     def __init__(self):
         self.health = 20
         self.speed = 0.5
-        self.image = pygame.image.load("player.png").convert_alpha()
+        self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
         self.pos = self.image.get_rect()
+
+    def get_random_sprite(self):
+        path_to_sprite = os.path.abspath("enemies/hard/")
+        sprites = []
+        for entry in os.listdir(path_to_sprite):
+            full_path = os.path.join(path_to_sprite, entry)
+            sprites.append(full_path)
+        return sprites[random.randrange(0, 2)]
