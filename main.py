@@ -68,7 +68,7 @@ def main():
 
     start_time = pygame.time.get_ticks()
     last_spawn_time = start_time
-    spawn_interval = random.randint(2000, 5000)
+    spawn_interval = random.randint(1000, 3000)
     ROUND_DURATION_MS = 600_000
 
     damage_tick = 0
@@ -273,7 +273,7 @@ def main():
 
         if on_cooldown:
             attack_cooldown += 1
-            if attack_cooldown > 30:
+            if attack_cooldown > 20:
                 attack_cooldown = 0
                 on_cooldown = False
 
