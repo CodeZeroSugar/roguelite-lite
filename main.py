@@ -61,6 +61,7 @@ def main():
 
     screen.blit(background, (0, 0))
 
+    # Player init
     p = Player(player, 3.0, 10, 10)
     health_bar_pos = (50, 35)
     health_bar_width = 200
@@ -74,6 +75,7 @@ def main():
     # Font for timer
     font = pygame.font.SysFont("Arial", 36, bold=True)
 
+    # Where enemies live
     objects = []
 
     score_counter = 0
