@@ -10,7 +10,7 @@ class Player:
         self.speed = speed
         self.image = image
         self.flip_image = pygame.transform.flip(image, True, False)
-        self.pos = image.get_rect().move((SCREEN_WIDTH // 2), SCREEN_HEIGHT // 2)
+        self.pos = image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         self.hitbox = (image.get_rect()).scale_by(0.55, 0.75)
         self.health = health
         self.max_health = max_health
@@ -126,7 +126,8 @@ class Enemy:
         self.image = image
         self.speed = speed
         self.health = health
-        self.pos = image.get_rect()
+        self.pos = [0.0, 0.0]
+        self.rect = self.image.get_rect()
 
     def get_random_sprite(self):
         raise NotImplementedError("Children contain implementations")
@@ -136,10 +137,9 @@ class Enemy:
         dy = target[1] - self.pos[1]
         distance = math.hypot(dx, dy)
         if distance > 0:
-            dx /= distance
-            dy /= distance
-            self.pos[0] += dx * self.speed
-            self.pos[1] += dy * self.speed
+            self.pos[0] += (dx / distance) * self.speed
+            self.pos[1] += (dy / distance) * self.speed
+        self.rect.center = (round(self.pos[0]), round(self.pos[1]))
 
     def take_damage(self):
         if self.health > 0:
@@ -154,7 +154,8 @@ class EasyEnemy(Enemy):
         self.health = 4
         self.speed = 2.0
         self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
-        self.pos = self.image.get_rect()
+        self.pos = [0.0, 0.0]
+        self.rect = self.image.get_rect()
 
     def get_random_sprite(self):
         path_to_sprite = os.path.abspath("enemies/easy/")
@@ -170,7 +171,8 @@ class MediumEnemy(Enemy):
         self.health = 8
         self.speed = 1.0
         self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
-        self.pos = self.image.get_rect()
+        self.pos = [0.0, 0.0]
+        self.rect = self.image.get_rect()
 
     def get_random_sprite(self):
         path_to_sprite = os.path.abspath("enemies/medium/")
@@ -186,7 +188,8 @@ class HardEnemy(Enemy):
         self.health = 20
         self.speed = 0.5
         self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
-        self.pos = self.image.get_rect()
+        self.pos = [0.0, 0.0]
+        self.rect = self.image.get_rect()
 
     def get_random_sprite(self):
         path_to_sprite = os.path.abspath("enemies/hard/")

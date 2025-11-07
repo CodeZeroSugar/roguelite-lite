@@ -1,8 +1,27 @@
 import pygame
 import random
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_HEIGHT, SPRITE_WIDTH
 from classes import Player, EasyEnemy, MediumEnemy, HardEnemy
 from items import Food
+
+
+def place_enemy(enemy):
+    edge = random.choice(["top", "bottom", "left", "right"])
+
+    if edge == "top":
+        enemy.pos[0] = random.uniform(0, SCREEN_WIDTH)
+        enemy.pos[1] = 0.0
+    elif edge == "bottom":
+        enemy.pos[0] = random.uniform(0, SCREEN_WIDTH)
+        enemy.pos[1] = SCREEN_HEIGHT - SPRITE_HEIGHT
+    elif edge == "left":
+        enemy.pos[0] = 0.0
+        enemy.pos[1] = random.uniform(0, SCREEN_HEIGHT)
+    else:
+        enemy.pos[0] = SCREEN_WIDTH - SPRITE_WIDTH
+        enemy.pos[1] = random.uniform(0, SCREEN_HEIGHT)
+
+    enemy.rect.center = (int(enemy.pos[0]), int(enemy.pos[1]))
 
 
 def choose_enemy_type(elapsed_sec):
@@ -34,19 +53,12 @@ def main():
         "./backgrounds/dungeon_brick_wall_blue.png"
     ).convert()
 
-    # Title Screen
-    while running and not play_game:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                play_game = True
-        screen.blit(title_background, (0, 0))
-        pygame.display.flip()
-        clock.tick(60)
-
     player = pygame.image.load("player.png").convert_alpha()
+
     background = pygame.image.load(
         "./backgrounds/dungeon_brick_wall_blue.png"
     ).convert()
+
     screen.blit(background, (0, 0))
 
     p = Player(player, 3.0, 10, 10)
@@ -71,6 +83,7 @@ def main():
     spawn_interval = random.randint(1000, 3000)
     ROUND_DURATION_MS = 600_000
 
+    # Cooldown initialization
     damage_tick = 0
     damaged = False
 
@@ -79,9 +92,16 @@ def main():
     attack_cooldown = 0
     on_cooldown = False
 
-    pygame.mixer.music.play()
-
     while running:
+        # Title Screen
+        while running and not play_game:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    play_game = True
+            screen.blit(title_background, (0, 0))
+            pygame.display.flip()
+            clock.tick(60)
+
         # Make sure tunes are playing
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play()
@@ -101,11 +121,11 @@ def main():
             enemy_class = choose_enemy_type(elapsed_sec)
             if enemy_class:
                 o = enemy_class()
-                o.pos[0] = random.randint(0, SCREEN_WIDTH - 20)
-                o.pos[1] = random.randint(0, SCREEN_HEIGHT - 20)
+                place_enemy(o)
                 objects.append(o)
                 print(f"{enemy_class.__name__} spawned")
             last_spawn_time = current_time
+            spawn_interval = random.randint(1000, 3000)
 
         # Player input
         keys = pygame.key.get_pressed()
@@ -142,7 +162,7 @@ def main():
 
         # Player damaged
         for o in objects:
-            if o.pos.colliderect(p.hitbox) and damage_tick == 0:
+            if o.rect.colliderect(p.hitbox) and damage_tick == 0:
                 p.take_damage()
                 damaged = True
                 damage_tick = 1
@@ -151,7 +171,7 @@ def main():
         if p.arc_active:
             p.draw_arc(screen)
             for o in objects:
-                if o.pos.colliderect(p.attack_hitbox):
+                if o.rect.colliderect(p.attack_hitbox):
                     if o not in p.hit_enemies:
                         o.take_damage()
                         p.hit_enemies.append(o)
@@ -166,7 +186,7 @@ def main():
         # Food chance
         if create_food is True:
             print("Attempting to spawn food")
-            if random.randrange(1, 100) <= 80:
+            if random.randrange(1, 101) <= 50:
                 print("creating food!")
                 food_objects.append(Food())
                 print(f"Number of food on screen: {len(food_objects)}")
@@ -238,7 +258,7 @@ def main():
             screen.blit(food.image, food.food_rect)
 
         for o in objects:
-            screen.blit(o.image, o.pos)
+            screen.blit(o.image, o.rect)
 
         # Draw Timer
         minutes = remaining_sec // 60
