@@ -5,6 +5,15 @@ from classes import Player, EasyEnemy, MediumEnemy, HardEnemy
 from items import Food
 
 
+def check_level(score_counter, player):
+    current_level = player.level
+    next_level = current_level + 1
+    score_needed = next_level**2
+    if score_counter >= score_needed:
+        player.level += 1
+        print(f"Player level up! Level is now: {player.level}")
+
+
 def place_enemy(enemy):
     edge = random.choice(["top", "bottom", "left", "right"])
 
@@ -104,6 +113,9 @@ def main():
             pygame.display.flip()
             clock.tick(60)
 
+        # check if player leveled up
+        check_level(score_counter, p)
+
         # Make sure tunes are playing
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play()
@@ -181,7 +193,12 @@ def main():
         # Increment score
         for o in objects:
             if o.health <= 0:
-                score_counter += 1
+                if type(o) is EasyEnemy:
+                    score_counter += 1
+                if type(o) is MediumEnemy:
+                    score_counter += 3
+                if type(o) is HardEnemy:
+                    score_counter += 5
                 print(f"Score: {score_counter}")
                 create_food = True
 

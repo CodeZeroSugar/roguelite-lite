@@ -32,6 +32,8 @@ class Player:
         self.slash_active = False
         self.slash_start = 0
         self.slash_duration = 270
+        # Level tracking
+        self.level = 0
 
     def move(self, up=False, down=False, left=False, right=False):
         if right:
