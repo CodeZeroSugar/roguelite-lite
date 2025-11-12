@@ -5,6 +5,10 @@ from classes import Player, EasyEnemy, MediumEnemy, HardEnemy
 from items import Food
 
 
+def new_ability():
+    print("New ability granted!")
+
+
 def check_level(score_counter, player):
     current_level = player.level
     next_level = current_level + 1
@@ -12,6 +16,10 @@ def check_level(score_counter, player):
     if score_counter >= score_needed:
         player.level += 1
         print(f"Player level up! Level is now: {player.level}")
+
+        if player.level % 5 == 0:
+            print("Time to pick a new ability!")
+            new_ability()
 
 
 def place_enemy(enemy):
@@ -54,7 +62,12 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
+
+    # initialize music
     pygame.mixer.music.load("./music/pixelated_carnage_1.mp3")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.pause()
+
     running = True
     play_game = False
 
@@ -119,6 +132,7 @@ def main():
         # Make sure tunes are playing
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play()
+
         current_time = pygame.time.get_ticks()
 
         elapsed_ms = current_time - start_time
@@ -137,7 +151,6 @@ def main():
                 o = enemy_class()
                 place_enemy(o)
                 objects.append(o)
-                print(f"{enemy_class.__name__} spawned")
             last_spawn_time = current_time
             spawn_interval = random.randint(1000, 3000)
 
@@ -163,7 +176,6 @@ def main():
                 if event.key == pygame.K_SPACE and not on_cooldown:
                     p.basic_attack(screen)
                     p.start_slash()
-                    print("Player attacks")
                     on_cooldown = True
 
         # Update logic
@@ -199,7 +211,6 @@ def main():
                     score_counter += 3
                 if type(o) is HardEnemy:
                     score_counter += 5
-                print(f"Score: {score_counter}")
                 create_food = True
 
         # Food chance
