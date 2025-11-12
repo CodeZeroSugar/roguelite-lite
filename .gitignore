@@ -5,6 +5,15 @@ build/
 dist/
 wheels/
 *.egg-info
+*.pyd
 
 # Virtual environments
 .venv
+venv/
+env/
+
+# IDE / temp 
+.idea/
+.vscode/
+*.swp
+.DS_Store
