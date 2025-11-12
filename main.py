@@ -59,14 +59,14 @@ def main():
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
+    # pygame.mixer.pre_init(frequency=48000, size=-16, channels=2, buffer=65536)
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
 
     # initialize music
-    pygame.mixer.music.load("./music/pixelated_carnage_1.mp3")
-    pygame.mixer.music.play(-1)
-    pygame.mixer.music.pause()
+    # music = pygame.mixer.Sound("./music/pixelated_carnage_1.wav")
+    # music.play(-1)
 
     running = True
     play_game = False
@@ -128,10 +128,6 @@ def main():
 
         # check if player leveled up
         check_level(score_counter, p)
-
-        # Make sure tunes are playing
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.play()
 
         current_time = pygame.time.get_ticks()
 
