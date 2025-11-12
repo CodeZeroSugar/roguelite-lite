@@ -1,12 +1,24 @@
 import pygame
 import random
+from abilities import AutomaticCrossbow
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_HEIGHT, SPRITE_WIDTH
 from classes import Player, EasyEnemy, MediumEnemy, HardEnemy
 from items import Food
 
 
-def new_ability():
-    print("New ability granted!")
+def new_ability(player):
+    options = [AutomaticCrossbow]
+    available = [
+        cls
+        for cls in options
+        if not any(ab.name == cls().name for ab in player.abilities)
+    ]
+    if not available:
+        print("No new abilities available")
+        return
+
+    chosen = random.choice(options)
+    player.grant_ability(chosen)
 
 
 def check_level(score_counter, player):
@@ -17,9 +29,9 @@ def check_level(score_counter, player):
         player.level += 1
         print(f"Player level up! Level is now: {player.level}")
 
-        if player.level % 5 == 0:
+        if player.level % 2 == 0:
             print("Time to pick a new ability!")
-            new_ability()
+            new_ability(player)
 
 
 def place_enemy(enemy):
@@ -197,6 +209,15 @@ def main():
                     if o not in p.hit_enemies:
                         o.take_damage()
                         p.hit_enemies.append(o)
+
+        # Player ability block
+        for ab in p.abilities:
+            ab.update()
+
+        for ab in p.abilities:
+            if ab.ready():
+                ab.fire(p, objects)
+                ab.start_cooldown()
 
         # Increment score
         for o in objects:

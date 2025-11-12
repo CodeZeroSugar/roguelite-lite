@@ -34,6 +34,8 @@ class Player:
         self.slash_duration = 270
         # Level tracking
         self.level = 0
+        # Obtained abilities
+        self.abilities = []
 
     def move(self, up=False, down=False, left=False, right=False):
         if right:
@@ -122,6 +124,13 @@ class Player:
                 self.arc_active = False
                 self.hit_enemies = []
 
+    def grant_ability(self, ability_class):
+        new_ability = ability_class()
+        if any(ab.name == new_ability.name for ab in self.abilities):
+            return
+        self.abilities.append(new_ability)
+        print(f"Granted {new_ability.name!r}")
+
 
 class Enemy:
     def __init__(self, image, speed, health):
@@ -143,9 +152,9 @@ class Enemy:
             self.pos[1] += (dy / distance) * self.speed
         self.rect.center = (round(self.pos[0]), round(self.pos[1]))
 
-    def take_damage(self):
+    def take_damage(self, damage=2):
         if self.health > 0:
-            self.health -= 2
+            self.health -= damage
             print(f"Enemy health is {self.health}")
         else:
             print("Enemy health is 0!")
