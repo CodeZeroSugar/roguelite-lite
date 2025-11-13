@@ -36,6 +36,7 @@ class Player:
         self.level = 0
         # Obtained abilities
         self.abilities = []
+        self.bolts = []
 
     def move(self, up=False, down=False, left=False, right=False):
         if right:
@@ -98,7 +99,7 @@ class Player:
             self.slash_index = 0
             self.hit_enemies = []
 
-    def update(self):
+    def update(self, enemies):
         current_time = pygame.time.get_ticks()
         # slash animation
         if self.slash_active:
@@ -123,6 +124,8 @@ class Player:
             if current_time - self.arc_start_time > self.arc_duration:
                 self.arc_active = False
                 self.hit_enemies = []
+        # Update all bolts
+        self.bolts = [bolt for bolt in self.bolts if not bolt.update(enemies)]
 
     def grant_ability(self, ability_class):
         new_ability = ability_class()

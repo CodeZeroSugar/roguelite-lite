@@ -114,9 +114,10 @@ def main():
 
     score_counter = 0
 
-    start_time = pygame.time.get_ticks()
-    last_spawn_time = start_time
     spawn_interval = random.randint(1000, 3000)
+    timer_started = False
+    start_time = 0
+    last_spawn_time = 0
     ROUND_DURATION_MS = 600_000
 
     # Cooldown initialization
@@ -137,6 +138,12 @@ def main():
             screen.blit(title_background, (0, 0))
             pygame.display.flip()
             clock.tick(60)
+
+        # Start Timer
+        if not timer_started:
+            start_time = pygame.time.get_ticks()
+            last_spawn_time = start_time
+            timer_started = True
 
         # check if player leveled up
         check_level(score_counter, p)
@@ -188,7 +195,10 @@ def main():
 
         # Update logic
         target = p.pos.center
-        p.update()
+        p.update(objects)
+
+        # Update bolts
+        p.bolts = [bolt for bolt in p.bolts if not bolt.update(objects)]
 
         # Move enemies
         for o in objects:
@@ -306,6 +316,10 @@ def main():
 
         for o in objects:
             screen.blit(o.image, o.rect)
+
+        # draw bolts
+        for bolt in p.bolts:
+            bolt.draw(screen)
 
         # Draw Timer
         minutes = remaining_sec // 60
