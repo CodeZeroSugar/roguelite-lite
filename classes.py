@@ -37,6 +37,8 @@ class Player:
         # Obtained abilities
         self.abilities = []
         self.bolts = []
+        self.axes = []
+        self.flails = []
 
     def move(self, up=False, down=False, left=False, right=False):
         if right:
@@ -126,6 +128,12 @@ class Player:
                 self.hit_enemies = []
         # Update all bolts
         self.bolts = [bolt for bolt in self.bolts if not bolt.update(enemies)]
+        # Update all axes
+        self.axes = [axe for axe in self.axes if not axe.update(enemies)]
+        # Update flail
+        self.flails = [
+            flail for flail in self.flails if not flail.update(self, enemies)
+        ]
 
     def grant_ability(self, ability_class):
         new_ability = ability_class()

@@ -1,13 +1,13 @@
 import pygame
 import random
-from abilities import AutomaticCrossbow
+from abilities import AutomaticCrossbow, ThrowingAxes, WildFlail
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_HEIGHT, SPRITE_WIDTH
 from classes import Player, EasyEnemy, MediumEnemy, HardEnemy
 from items import Food
 
 
 def new_ability(player):
-    options = [AutomaticCrossbow]
+    options = [AutomaticCrossbow, ThrowingAxes, WildFlail]
     available = [
         cls
         for cls in options
@@ -200,6 +200,12 @@ def main():
         # Update bolts
         p.bolts = [bolt for bolt in p.bolts if not bolt.update(objects)]
 
+        # Update axes
+        p.axes = [axe for axe in p.axes if not axe.update(objects)]
+
+        # Update flail
+        p.flails = [flail for flail in p.flails if not flail.update(p, objects)]
+
         # Move enemies
         for o in objects:
             o.move_toward(target)
@@ -320,6 +326,14 @@ def main():
         # draw bolts
         for bolt in p.bolts:
             bolt.draw(screen)
+
+        # draw axes
+        for axe in p.axes:
+            axe.draw(screen)
+
+        # draw flail
+        for flail in p.flails:
+            flail.draw(screen)
 
         # Draw Timer
         minutes = remaining_sec // 60
