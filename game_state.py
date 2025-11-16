@@ -6,4 +6,3 @@ class GameState(Enum):
     PLAY = 2
     LOSE = 3
     WIN = 4
-    QUIT = 5
