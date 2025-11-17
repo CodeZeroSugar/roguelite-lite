@@ -154,6 +154,14 @@ class Player:
         elif dx < 0:
             self.facing = "left"
 
+        player_radius = 32
+        self.pos.centerx = max(
+            player_radius, min(self.pos.centerx, SCREEN_WIDTH - player_radius)
+        )
+        self.pos.centery = max(
+            player_radius, min(self.pos.centery, SCREEN_HEIGHT - player_radius)
+        )
+
         # Attack trigger
         if keys[pygame.K_SPACE] and not self.is_attacking:
             self.set_state("attack")

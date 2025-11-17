@@ -56,7 +56,7 @@ def main():
 
     score_counter = 0
 
-    spawn_interval = random.randint(1000, 3000)
+    spawn_interval = random.randint(0, 2000)
     timer_started = False
     start_time = 0
     last_spawn_time = 0
@@ -200,7 +200,7 @@ def main():
                     # Food chance
                     if create_food is True:
                         print("Attempting to spawn food")
-                        if random.randrange(0, 101) <= 20:
+                        if random.randrange(0, 101) <= 10:
                             print("creating food!")
                             food_objects.append(Food())
                             print(f"Number of food on screen: {len(food_objects)}")
