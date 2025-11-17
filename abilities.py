@@ -99,7 +99,7 @@ class Flail:
         self.pos.centery = player.hitbox.centery + self.radius * math.sin(self.angle)
 
         for enemy in enemies:
-            if self.pos.colliderect(enemy.rect):
+            if self.pos.colliderect(enemy.hitbox):
                 enemy.take_damage(2)
                 return True
 
@@ -111,7 +111,7 @@ class Flail:
 
 class Axe:
     def __init__(self, start_x, start_y, direction, speed=5):
-        self.pos = pygame.Rect(0, 0, 12, 6)
+        self.pos = pygame.Rect(0, 0, 65, 70)
         self.pos.center = (start_x, start_y)
 
         self.image = pygame.image.load("./items/axe.png").convert_alpha()
@@ -129,7 +129,7 @@ class Axe:
             self.pos.y -= self.speed
 
         for enemy in enemies:
-            if self.pos.colliderect(enemy.rect):
+            if self.pos.colliderect(enemy.hitbox):
                 enemy.take_damage(4)
                 return True
 
@@ -182,7 +182,7 @@ class Bolt:
         self.age += 1
 
         for enemy in enemies:
-            if self.pos.colliderect(enemy.rect):
+            if self.pos.colliderect(enemy.hitbox):
                 enemy.take_damage(1)
                 return True
 

@@ -25,6 +25,7 @@ def main():
     play_game = False
 
     title_background = pygame.image.load("./backgrounds/menu_screen.png").convert()
+    death_screen = pygame.image.load("./backgrounds/death_screen.png").convert()
 
     player = pygame.image.load("player.png").convert_alpha()
 
@@ -47,6 +48,8 @@ def main():
 
     # Font for timer
     font = pygame.font.SysFont("Arial", 36, bold=True)
+    remaining_sec = 0
+    remaining_ms = 0
 
     # Where enemies live
     objects = []
@@ -84,6 +87,11 @@ def main():
                         ):
                             state_input = GameState.PLAY
                             play_game = True
+                        if (
+                            pygame.key.get_pressed()[pygame.K_q]
+                            or pygame.key.get_pressed()[pygame.K_ESCAPE]
+                        ):
+                            pygame.quit()
                     screen.blit(title_background, (0, 0))
                     pygame.display.flip()
                     clock.tick(60)
@@ -167,7 +175,7 @@ def main():
 
                     # Player damaged
                     for o in objects:
-                        if o.rect.colliderect(p.hitbox) and damage_tick == 0:
+                        if o.hitbox.colliderect(p.hitbox) and damage_tick == 0:
                             p.take_damage()
                             damaged = True
                             damage_tick = 1
@@ -176,7 +184,7 @@ def main():
                     if p.arc_active:
                         p.draw_arc(screen)
                         for o in objects:
-                            if o.rect.colliderect(p.attack_hitbox):
+                            if o.hitbox.colliderect(p.attack_hitbox):
                                 if o not in p.hit_enemies:
                                     o.take_damage()
                                     p.hit_enemies.append(o)
@@ -229,6 +237,7 @@ def main():
                     if p.health <= 0:
                         print("You died!")
                         state_input = GameState.LOSE
+
                         break
 
                     # Draw
@@ -238,6 +247,8 @@ def main():
                         screen, (255, 0, 0), p.hitbox.clamp(p.pos), width=1
                     )
                     p.hitbox.center = p.pos.center
+                    for o in objects:
+                        o.hitbox.center = o.rect.center
 
                     # health bar
                     health_ratio = p.health / p.max_health
@@ -373,7 +384,30 @@ def main():
                             or pygame.key.get_pressed()[pygame.K_ESCAPE]
                         ):
                             pygame.quit()
-                    screen.blit(title_background, (0, 0))
+
+                    screen.blit(death_screen, (0, 0))
+                    # Draw Timer
+                    minutes = remaining_sec // 60
+                    seconds = remaining_sec % 60
+                    timer_text = f"{minutes:02d}:{seconds:02d}"
+                    timer_surface = font.render(timer_text, True, (255, 255, 255))
+                    timer_rect = timer_surface.get_rect()
+                    timer_rect.topright = (SCREEN_WIDTH - 20, 20)
+                    screen.blit(timer_surface, timer_rect)
+                    bg_rect = timer_rect.inflate(20, 10)
+                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
+                    screen.blit(timer_surface, timer_rect)
+
+                    # Draw Score score_counter
+                    score_text = f"Score: {score_counter}"
+                    score_surface = font.render(score_text, True, (255, 255, 255))
+                    score_rect = score_surface.get_rect()
+                    score_rect.topright = (SCREEN_WIDTH - 140, 20)
+                    screen.blit(score_surface, score_rect)
+                    bg_score = score_rect.inflate(20, 10)
+                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_score)
+                    screen.blit(score_surface, score_rect)
+
                     pygame.display.flip()
                     clock.tick(60)
                     if play_game:
@@ -395,7 +429,31 @@ def main():
                             or pygame.key.get_pressed()[pygame.K_ESCAPE]
                         ):
                             pygame.quit()
+
                     screen.blit(title_background, (0, 0))
+
+                    # Draw Timer
+                    minutes = remaining_sec // 60
+                    seconds = remaining_sec % 60
+                    timer_text = f"{minutes:02d}:{seconds:02d}"
+                    timer_surface = font.render(timer_text, True, (255, 255, 255))
+                    timer_rect = timer_surface.get_rect()
+                    timer_rect.topright = (SCREEN_WIDTH - 20, 20)
+                    screen.blit(timer_surface, timer_rect)
+                    bg_rect = timer_rect.inflate(20, 10)
+                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
+                    screen.blit(timer_surface, timer_rect)
+
+                    # Draw Score score_counter
+                    score_text = f"Score: {score_counter}"
+                    score_surface = font.render(score_text, True, (255, 255, 255))
+                    score_rect = score_surface.get_rect()
+                    score_rect.topright = (SCREEN_WIDTH - 140, 20)
+                    screen.blit(score_surface, score_rect)
+                    bg_score = score_rect.inflate(20, 10)
+                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_score)
+                    screen.blit(score_surface, score_rect)
+
                     pygame.display.flip()
                     clock.tick(60)
                     if play_game:

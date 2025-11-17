@@ -178,6 +178,7 @@ class EasyEnemy(Enemy):
         self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
         self.pos = [0.0, 0.0]
         self.rect = self.image.get_rect()
+        self.hitbox = (self.image.get_rect()).scale_by(0.55, 0.75)
 
     def get_random_sprite(self):
         path_to_sprite = os.path.abspath("enemies/easy/")
@@ -195,6 +196,7 @@ class MediumEnemy(Enemy):
         self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
         self.pos = [0.0, 0.0]
         self.rect = self.image.get_rect()
+        self.hitbox = (self.image.get_rect()).scale_by(0.55, 0.75)
 
     def get_random_sprite(self):
         path_to_sprite = os.path.abspath("enemies/medium/")
@@ -212,6 +214,7 @@ class HardEnemy(Enemy):
         self.image = pygame.image.load(self.get_random_sprite()).convert_alpha()
         self.pos = [0.0, 0.0]
         self.rect = self.image.get_rect()
+        self.hitbox = (self.image.get_rect()).scale_by(0.55, 0.75)
 
     def get_random_sprite(self):
         path_to_sprite = os.path.abspath("enemies/hard/")
