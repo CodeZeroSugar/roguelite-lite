@@ -36,7 +36,7 @@ def main():
     screen.blit(background, (0, 0))
 
     # Player init
-    p = Player(player, 2.5, 10, 10)
+    p = Player(player, 2.0, 10, 10)
     health_bar_pos = (50, 35)
     health_bar_width = 200
     health_bar_height = 20
@@ -200,7 +200,7 @@ def main():
                     # Food chance
                     if create_food is True:
                         print("Attempting to spawn food")
-                        if random.randrange(1, 101) <= 50:
+                        if random.randrange(0, 101) <= 33:
                             print("creating food!")
                             food_objects.append(Food())
                             print(f"Number of food on screen: {len(food_objects)}")

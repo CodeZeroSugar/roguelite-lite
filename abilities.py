@@ -42,7 +42,7 @@ class AutomaticCrossbow(Ability):
                 e.rect.centerx - player.pos.centerx, e.rect.centery - player.pos.centery
             ),
         )
-        MAX_RANGE = 350
+        MAX_RANGE = 500
         dist = math.hypot(
             closest.rect.centerx - player.pos.centerx,
             closest.rect.centery - player.pos.centery,
@@ -111,7 +111,7 @@ class Flail:
 
 class Axe:
     def __init__(self, start_x, start_y, direction, speed=5):
-        self.pos = pygame.Rect(0, 0, 65, 70)
+        self.pos = pygame.Rect(0, 0, 45, 48)
         self.pos.center = (start_x, start_y)
 
         self.image = pygame.image.load("./items/axe.png").convert_alpha()

@@ -27,7 +27,7 @@ def check_level(score_counter, player):
         player.level += 1
         print(f"Player level up! Level is now: {player.level}")
 
-        if player.level % 2 == 0:
+        if player.level % 5 == 0:
             print("Time to pick a new ability!")
             new_ability(player)
 
