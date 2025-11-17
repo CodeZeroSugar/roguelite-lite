@@ -2,6 +2,7 @@ import pygame
 import math
 import os
 import random
+import animation
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_HEIGHT, SPRITE_WIDTH
 
 
@@ -18,7 +19,6 @@ class Player:
         self.arc_start_time = 0
         self.arc_duration = 300
         self.arc_color = (255, 255, 255)
-        self.facing = 1
         self.hit_enemies = []
         self.attack_hitbox = pygame.Rect(0, 0, 80, 60)
         # slash animation
@@ -32,6 +32,33 @@ class Player:
         self.slash_active = False
         self.slash_start = 0
         self.slash_duration = 270
+        # Load 128x128 sprite sheets
+        self.idle_sheet = animation.SpriteSheet(
+            "./animations/player/Idle.png", frame_count=4
+        )
+        self.walk_sheet = animation.SpriteSheet(
+            "./animations/player/Walk.png", frame_count=8
+        )
+        self.attack_sheet = animation.SpriteSheet(
+            "./animations/player/Attack_1.png", frame_count=5
+        )
+        # Compute offsets for each sheet
+        self.offsets = {
+            "idle": animation.get_center_offset(self.idle_sheet),
+            "walk": animation.get_center_offset(self.walk_sheet),
+            "attack": animation.get_center_offset(self.attack_sheet),
+        }
+        # Create animations
+        self.animations = {
+            "idle": animation.Animation(self.idle_sheet, base_fps=8),
+            "walk": animation.Animation(self.walk_sheet, base_fps=12),
+            "attack": animation.Animation(self.attack_sheet, base_fps=15, loop=False),
+        }
+        # Current state
+        self.state = "idle"
+        self.facing = "right"
+        self.current_anim = self.animations["idle"]
+        self.is_attacking = False
         # Level tracking
         self.level = 0
         # Obtained abilities
@@ -103,6 +130,48 @@ class Player:
 
     def update(self, enemies):
         current_time = pygame.time.get_ticks()
+        keys = pygame.key.get_pressed()
+        dx = dy = 0
+        # WASD movement
+        if keys[pygame.K_w]:
+            dy -= self.speed
+        if keys[pygame.K_s]:
+            dy += self.speed
+        if keys[pygame.K_a]:
+            dx -= self.speed
+        if keys[pygame.K_d]:
+            dx += self.speed
+
+        moving = dx != 0 or dy != 0
+
+        # Update position
+        self.pos[0] += dx
+        self.pos[1] += dy
+
+        # Update facing direction
+        if dx > 0:
+            self.facing = "right"
+        elif dx < 0:
+            self.facing = "left"
+
+        # Attack trigger
+        if keys[pygame.K_SPACE] and not self.is_attacking:
+            self.set_state("attack")
+            self.is_attacking = True
+        elif not keys[pygame.K_SPACE]:
+            self.is_attacking = False
+
+        # Switch after attack finishes
+        if self.state == "attack" and self.current_anim.finished:
+            self.set_state("walk" if moving else "idle")
+
+        # Update state logic
+        elif self.state != "attack":
+            self.set_state("walk" if moving else "idle")
+
+        # Update animation
+        self.current_anim.update()
+
         # slash animation
         if self.slash_active:
             elapsed = current_time - self.slash_start
@@ -134,6 +203,29 @@ class Player:
         self.flails = [
             flail for flail in self.flails if not flail.update(self, enemies)
         ]
+
+    def set_state(self, new_state):
+        if self.state != new_state:
+            self.state = new_state
+            self.current_anim = self.animations[new_state]
+            self.current_anim.reset()
+
+    def draw(self, surface):
+        anim = self.current_anim
+        frame = anim.sprite_sheet.frames[anim.current_frame]
+
+        offset_x, offset_y = self.offsets[self.state]
+
+        # Flip if facing left
+        if self.facing == "left":
+            frame = pygame.transform.flip(frame, True, False)
+            offset_x = 128 - offset_x
+
+        draw_x = int(self.pos.centerx - offset_x)
+        draw_y = int(self.pos.centery - offset_y)
+
+        # Draw centered
+        surface.blit(frame, (draw_x, draw_y))
 
     def grant_ability(self, ability_class):
         new_ability = ability_class()

@@ -131,19 +131,7 @@ def main():
                         spawn_interval = random.randint(1000, 3000)
 
                     # Player input
-                    keys = pygame.key.get_pressed()
-                    if keys[pygame.K_w]:
-                        p.move(up=True)
-                    if keys[pygame.K_s]:
-                        p.move(down=True)
-                    if keys[pygame.K_a]:
-                        p.move(left=True)
-                        p.image = p.flip_image
-                        p.facing = -1
-                    if keys[pygame.K_d]:
-                        p.move(right=True)
-                        p.image = player
-                        p.facing = 1
+                    p.update(objects)
 
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
@@ -286,7 +274,7 @@ def main():
                         2,
                     )
 
-                    screen.blit(p.image, p.pos)
+                    p.draw(screen)
 
                     # slash
                     if p.slash_active:
