@@ -12,14 +12,14 @@ def main():
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
-    # pygame.mixer.pre_init(frequency=48000, size=-16, channels=2, buffer=65536)
+    pygame.mixer.pre_init(frequency=48000, size=-16, channels=2, buffer=65536)
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
 
     # initialize music
-    # music = pygame.mixer.Sound("./music/pixelated_carnage_1.wav")
-    # music.play(-1)
+    music = pygame.mixer.Sound("./music/pixelated_carnage_1.wav")
+    music.play(-1)
 
     running = True
     play_game = False
@@ -200,7 +200,7 @@ def main():
                     # Food chance
                     if create_food is True:
                         print("Attempting to spawn food")
-                        if random.randrange(0, 101) <= 33:
+                        if random.randrange(0, 101) <= 20:
                             print("creating food!")
                             food_objects.append(Food())
                             print(f"Number of food on screen: {len(food_objects)}")
