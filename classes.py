@@ -12,7 +12,7 @@ class Player:
         self.image = image
         self.flip_image = pygame.transform.flip(image, True, False)
         self.pos = image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-        self.hitbox = (image.get_rect()).scale_by(0.55, 0.75)
+        self.hitbox = (image.get_rect()).scale_by(0.35, 0.55)
         self.health = health
         self.max_health = max_health
         self.arc_active = False
@@ -182,12 +182,12 @@ class Player:
             if elapsed >= self.slash_duration:
                 self.slash_active = False
 
-        if self.facing == 1:
+        if self.facing == "right":
             self.attack_hitbox.midleft = (self.pos.right - 10, self.pos.centery)
         else:
             self.attack_hitbox.midright = (self.pos.left + 10, self.pos.centery)
         if self.arc_active:
-            if self.facing == 1:
+            if self.facing == "right":
                 self.attack_hitbox.midleft = (self.pos.right, self.pos.centery)
             else:
                 self.attack_hitbox.midright = (self.pos.left, self.pos.centery)

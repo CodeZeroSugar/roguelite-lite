@@ -36,7 +36,7 @@ def main():
     screen.blit(background, (0, 0))
 
     # Player init
-    p = Player(player, 3.0, 10, 10)
+    p = Player(player, 2.5, 10, 10)
     health_bar_pos = (50, 35)
     health_bar_width = 200
     health_bar_height = 20
@@ -230,10 +230,6 @@ def main():
 
                     # Draw
                     screen.blit(background, (0, 0))
-                    pygame.draw.rect(screen, (255, 0, 0), p.pos, width=1)
-                    pygame.draw.rect(
-                        screen, (255, 0, 0), p.hitbox.clamp(p.pos), width=1
-                    )
                     p.hitbox.center = p.pos.center
                     for o in objects:
                         o.hitbox.center = o.rect.center
@@ -282,11 +278,11 @@ def main():
                             p.slash_index * p.slash_w, 0, p.slash_w, p.slash_h
                         )
                         frame = p.slash_sheet.subsurface(src_rect)
-                        if p.facing == -1:
+                        if p.facing == "left":
                             frame = pygame.transform.flip(frame, True, False)
                         dst_rect = frame.get_rect()
                         offset = 18
-                        if p.facing == 1:
+                        if p.facing == "right":
                             dst_rect.midleft = (p.pos.right - offset, p.pos.centery)
                         else:
                             dst_rect.midright = (p.pos.left + offset, p.pos.centery)
