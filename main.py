@@ -60,7 +60,7 @@ def main():
 
     score_counter = 0
 
-    spawn_interval = random.randint(0, 2000)
+    spawn_interval = random.randint(0, 1700)
     timer_started = False
     start_time = 0
     last_spawn_time = 0
@@ -358,6 +358,7 @@ def main():
 
             case GameState.LOSE:
                 play_game = False
+                # music.fadeout(2000)
                 while True:
                     for event in pygame.event.get():
                         if (
@@ -403,6 +404,7 @@ def main():
 
             case GameState.WIN:
                 play_game = False
+                # music.fadeout(2000)
                 while True:
                     for event in pygame.event.get():
                         if (
