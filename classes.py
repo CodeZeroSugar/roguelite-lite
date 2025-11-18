@@ -85,9 +85,9 @@ class Player:
         if self.pos.top < 0:
             self.pos.top = SCREEN_HEIGHT - SPRITE_HEIGHT
 
-    def take_damage(self):
+    def take_damage(self, damage=1):
         if self.health > 0:
-            self.health -= 1
+            self.health -= damage
             print(f"Player health is {self.health}")
         else:
             print("Player health is 0!")
@@ -323,3 +323,15 @@ class HardEnemy(Enemy):
             full_path = os.path.join(path_to_sprite, entry)
             sprites.append(full_path)
         return sprites[random.randrange(0, 2)]
+
+
+class SpecialEnemy(Enemy):
+    def __init__(self):
+        self.health = 30
+        self.speed = 2.5
+        self.image = pygame.image.load(
+            "./assets/images/enemies/special/orc_B8.png"
+        ).convert_alpha()
+        self.pos = [0.0, 0.0]
+        self.rect = self.image.get_rect()
+        self.hitbox = (self.image.get_rect()).scale_by(0.55, 0.75)

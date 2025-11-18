@@ -168,7 +168,10 @@ def main():
                     # Player damaged
                     for o in objects:
                         if o.hitbox.colliderect(p.hitbox) and damage_tick == 0:
-                            p.take_damage()
+                            if type(o).__name__ == "SpecialEnemy":
+                                p.take_damage(5)
+                            else:
+                                p.take_damage()
                             damaged = True
                             damage_tick = 1
 

@@ -1,7 +1,7 @@
 import random
 from abilities import AutomaticCrossbow, ThrowingAxes, WildFlail
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH, SPRITE_HEIGHT, SPRITE_WIDTH
-from classes import EasyEnemy, MediumEnemy, HardEnemy
+from classes import EasyEnemy, MediumEnemy, HardEnemy, SpecialEnemy
 
 
 def new_ability(player):
@@ -52,6 +52,8 @@ def place_enemy(enemy):
 
 
 def choose_enemy_type(elapsed_sec):
+    if random.randrange(0, 101) == 1:
+        return SpecialEnemy
     if elapsed_sec < 180:
         return EasyEnemy
     elif 180 <= elapsed_sec < 300:
