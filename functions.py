@@ -22,7 +22,7 @@ def new_ability(player):
 def check_level(score_counter, player):
     current_level = player.level
     next_level = current_level + 1
-    score_needed = next_level**2
+    score_needed = next_level**1.5
     if score_counter >= score_needed:
         player.level += 1
         print(f"Player level up! Level is now: {player.level}")
