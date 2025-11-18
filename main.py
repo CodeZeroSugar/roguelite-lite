@@ -18,19 +18,23 @@ def main():
     clock = pygame.time.Clock()
 
     # initialize music
-    music = pygame.mixer.Sound("./music/pixelated_carnage_1.wav")
+    music = pygame.mixer.Sound("./assets/music/pixelated_carnage_1.wav")
     music.play(-1)
 
     running = True
     play_game = False
 
-    title_background = pygame.image.load("./backgrounds/menu_screen.png").convert()
-    death_screen = pygame.image.load("./backgrounds/death_screen.png").convert()
+    title_background = pygame.image.load(
+        "./assets/images/backgrounds/menu_screen.png"
+    ).convert()
+    death_screen = pygame.image.load(
+        "./assets/images/backgrounds/death_screen.png"
+    ).convert()
 
-    player = pygame.image.load("player.png").convert_alpha()
+    player = pygame.image.load("./assets/images/player.png").convert_alpha()
 
     background = pygame.image.load(
-        "./backgrounds/dungeon_brick_wall_blue.png"
+        "./assets/images/backgrounds/dungeon_brick_wall_blue.png"
     ).convert()
 
     screen.blit(background, (0, 0))

@@ -23,7 +23,7 @@ class Player:
         self.attack_hitbox = pygame.Rect(0, 0, 80, 60)
         # slash animation
         self.slash_sheet = pygame.image.load(
-            "./animations/slash/slash2_128x128.png"
+            "./assets/animations/slash/slash2_128x128.png"
         ).convert_alpha()
         self.slash_frames = 9
         self.slash_w = 128
@@ -34,13 +34,13 @@ class Player:
         self.slash_duration = 270
         # Load 128x128 sprite sheets
         self.idle_sheet = animation.SpriteSheet(
-            "./animations/player/Idle.png", frame_count=4
+            "./assets/animations/player/Idle.png", frame_count=4
         )
         self.walk_sheet = animation.SpriteSheet(
-            "./animations/player/Walk.png", frame_count=8
+            "./assets/animations/player/Walk.png", frame_count=8
         )
         self.attack_sheet = animation.SpriteSheet(
-            "./animations/player/Attack_1.png", frame_count=5
+            "./assets/animations/player/Attack_1.png", frame_count=5
         )
         # Compute offsets for each sheet
         self.offsets = {
@@ -281,7 +281,7 @@ class EasyEnemy(Enemy):
         self.hitbox = (self.image.get_rect()).scale_by(0.55, 0.75)
 
     def get_random_sprite(self):
-        path_to_sprite = os.path.abspath("enemies/easy/")
+        path_to_sprite = os.path.abspath("assets/images/enemies/easy/")
         sprites = []
         for entry in os.listdir(path_to_sprite):
             full_path = os.path.join(path_to_sprite, entry)
@@ -299,7 +299,7 @@ class MediumEnemy(Enemy):
         self.hitbox = (self.image.get_rect()).scale_by(0.55, 0.75)
 
     def get_random_sprite(self):
-        path_to_sprite = os.path.abspath("enemies/medium/")
+        path_to_sprite = os.path.abspath("assets/images/enemies/medium/")
         sprites = []
         for entry in os.listdir(path_to_sprite):
             full_path = os.path.join(path_to_sprite, entry)
@@ -317,7 +317,7 @@ class HardEnemy(Enemy):
         self.hitbox = (self.image.get_rect()).scale_by(0.55, 0.75)
 
     def get_random_sprite(self):
-        path_to_sprite = os.path.abspath("enemies/hard/")
+        path_to_sprite = os.path.abspath("assets/images/enemies/hard/")
         sprites = []
         for entry in os.listdir(path_to_sprite):
             full_path = os.path.join(path_to_sprite, entry)

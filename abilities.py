@@ -88,7 +88,9 @@ class Flail:
     def __init__(self):
         self.pos = pygame.Rect(0, 0, 12, 12)
 
-        self.image = pygame.image.load("./items/flail.png").convert_alpha()
+        self.image = pygame.image.load(
+            "./assets/images/items/flail.png"
+        ).convert_alpha()
         self.radius = 100.0
         self.angle = 0.0
         self.orbit_speed = 0.025
@@ -110,11 +112,11 @@ class Flail:
 
 
 class Axe:
-    def __init__(self, start_x, start_y, direction, speed=5):
+    def __init__(self, start_x, start_y, direction, speed=3):
         self.pos = pygame.Rect(0, 0, 45, 48)
         self.pos.center = (start_x, start_y)
 
-        self.image = pygame.image.load("./items/axe.png").convert_alpha()
+        self.image = pygame.image.load("./assets/images/items/axe.png").convert_alpha()
 
         self.direction = direction
         self.speed = speed
@@ -164,7 +166,7 @@ class Bolt:
             self.vel_x = self.vel_y = 0
 
         # Load image of Bolt
-        self.image = pygame.image.load("./items/bolt.png").convert_alpha()
+        self.image = pygame.image.load("./assets/images/items/bolt.png").convert_alpha()
 
         # face in correct direction
         angle = math.degrees(math.atan2(self.vel_y, self.vel_x))

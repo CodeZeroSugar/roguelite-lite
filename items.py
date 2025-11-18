@@ -5,7 +5,9 @@ from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 class Food:
     def __init__(self):
-        self.image = pygame.image.load("./items/81_pizza.png").convert_alpha()
+        self.image = pygame.image.load(
+            "./assets/images/items/81_pizza.png"
+        ).convert_alpha()
         self.food_rect = self.image.get_rect().move(
             random.randint(0, SCREEN_WIDTH - 20), random.randint(0, SCREEN_HEIGHT - 20)
         )
