@@ -1,7 +1,8 @@
 import pygame
 import random
+import user_interface
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
-from classes import Player, EasyEnemy, MediumEnemy, HardEnemy
+from classes import Player, EasyEnemy, MediumEnemy, HardEnemy, SpecialEnemy
 from items import Food
 from functions import check_level, choose_enemy_type, place_enemy
 from game_state import GameState
@@ -58,7 +59,8 @@ def main():
     # Where enemies live
     objects = []
 
-    score_counter = 0
+    #    score_counter = 0
+    xp_bar = user_interface.ExperienceBar(p)
 
     spawn_interval = random.randint(0, 1700)
     timer_started = False
@@ -111,7 +113,7 @@ def main():
                         timer_started = True
 
                     # check if player leveled up
-                    check_level(score_counter, p)
+                    check_level(p)
 
                     current_time = pygame.time.get_ticks()
 
@@ -197,11 +199,17 @@ def main():
                     for o in objects:
                         if o.health <= 0:
                             if type(o) is EasyEnemy:
-                                score_counter += 1
+                                p.score += 1
+                                p.current_xp += 1
                             if type(o) is MediumEnemy:
-                                score_counter += 3
+                                p.score += 3
+                                p.current_xp += 3
                             if type(o) is HardEnemy:
-                                score_counter += 5
+                                p.score += 5
+                                p.current_xp += 5
+                            if type(o) is SpecialEnemy:
+                                p.score += 10
+                                p.current_xp += 10
                             create_food = True
 
                     # Food chance
@@ -327,7 +335,7 @@ def main():
                     screen.blit(timer_surface, timer_rect)
 
                     # Draw Score score_counter
-                    score_text = f"Score: {score_counter}"
+                    score_text = f"Score: {p.score}"
                     score_surface = font.render(score_text, True, (255, 255, 255))
                     score_rect = score_surface.get_rect()
                     score_rect.topright = (SCREEN_WIDTH - 140, 20)
@@ -335,6 +343,9 @@ def main():
                     bg_score = score_rect.inflate(20, 10)
                     pygame.draw.rect(screen, (0, 0, 0, 180), bg_score)
                     screen.blit(score_surface, score_rect)
+
+                    # Draw player level
+                    xp_bar.draw(screen)
 
                     # Cooldowns
                     create_food = False
@@ -391,7 +402,7 @@ def main():
                     screen.blit(timer_surface, timer_rect)
 
                     # Draw Score score_counter
-                    score_text = f"Score: {score_counter}"
+                    score_text = f"Score: {p.score}"
                     score_surface = font.render(score_text, True, (255, 255, 255))
                     score_rect = score_surface.get_rect()
                     score_rect.topright = (SCREEN_WIDTH - 140, 20)
@@ -438,7 +449,7 @@ def main():
                     screen.blit(timer_surface, timer_rect)
 
                     # Draw Score score_counter
-                    score_text = f"Score: {score_counter}"
+                    score_text = f"Score: {p.score}"
                     score_surface = font.render(score_text, True, (255, 255, 255))
                     score_rect = score_surface.get_rect()
                     score_rect.topright = (SCREEN_WIDTH - 140, 20)

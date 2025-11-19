@@ -1,7 +1,7 @@
 import random
+import classes
 from abilities import AutomaticCrossbow, ThrowingAxes, WildFlail
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH, SPRITE_HEIGHT, SPRITE_WIDTH
-from classes import EasyEnemy, MediumEnemy, HardEnemy, SpecialEnemy
 
 
 def new_ability(player):
@@ -19,17 +19,20 @@ def new_ability(player):
     player.grant_ability(chosen)
 
 
-def check_level(score_counter, player):
+def check_level(player):
     current_level = player.level
     next_level = current_level + 1
     score_needed = next_level**1.5
-    if score_counter >= score_needed:
+    if player.score >= score_needed:
         player.level += 1
         print(f"Player level up! Level is now: {player.level}")
 
         if player.level % 5 == 0:
             print("Time to pick a new ability!")
             new_ability(player)
+
+        return True
+    return False
 
 
 def place_enemy(enemy):
@@ -53,14 +56,16 @@ def place_enemy(enemy):
 
 def choose_enemy_type(elapsed_sec):
     if random.randrange(0, 101) == 1:
-        return SpecialEnemy
-    if elapsed_sec < 180:
-        return EasyEnemy
+        return classes.SpecialEnemy
+    elif elapsed_sec < 180:
+        return classes.EasyEnemy
     elif 180 <= elapsed_sec < 300:
-        return random.choice([EasyEnemy, MediumEnemy])
+        return random.choice([classes.EasyEnemy, classes.MediumEnemy])
     elif 300 <= elapsed_sec < 540:
-        return MediumEnemy
+        return classes.MediumEnemy
     elif 540 <= elapsed_sec < 600:
-        return random.choice([EasyEnemy, MediumEnemy, HardEnemy])
+        return random.choice(
+            [classes.EasyEnemy, classes.MediumEnemy, classes.HardEnemy]
+        )
     else:
         return None

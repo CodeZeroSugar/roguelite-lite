@@ -14,6 +14,7 @@ class Player:
         self.pos = image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         self.hitbox = (image.get_rect()).scale_by(0.35, 0.55)
         self.health = health
+        self.score = 0
         self.max_health = max_health
         self.arc_active = False
         self.arc_start_time = 0
@@ -61,6 +62,9 @@ class Player:
         self.is_attacking = False
         # Level tracking
         self.level = 0
+        self.next_level = 1
+        self.current_xp = 0
+        self.max_xp = 0
         # Obtained abilities
         self.abilities = []
         self.bolts = []
@@ -161,6 +165,12 @@ class Player:
         self.pos.centery = max(
             player_radius, min(self.pos.centery, SCREEN_HEIGHT - player_radius)
         )
+        # Update xp
+        if self.level == self.next_level:
+            print("Current xp reset")
+            self.current_xp = 0
+            self.max_xp = (self.level + 1) ** 1.5 - self.score
+            self.next_level += 1
 
         # Attack trigger
         if keys[pygame.K_SPACE] and not self.is_attacking:
