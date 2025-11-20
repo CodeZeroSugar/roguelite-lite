@@ -2,9 +2,9 @@ import pygame
 import random
 import user_interface
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
-from classes import Player, EasyEnemy, MediumEnemy, HardEnemy, SpecialEnemy
+from classes import Player
 from items import Food
-from functions import check_level, choose_enemy_type, place_enemy
+from functions import choose_enemy_type, place_enemy
 from game_state import GameState
 
 
@@ -41,12 +41,7 @@ def main():
     screen.blit(background, (0, 0))
 
     # Player init
-    p = Player(player, 2.0, 10, 10)
-    health_bar_pos = (50, 35)
-    health_bar_width = 200
-    health_bar_height = 20
-    background_color = (255, 0, 0)
-    health_color = (0, 255, 0)
+    p = Player(player, 3.0, 10, 10)
 
     # Initialize in game items
     food_objects = []
@@ -59,8 +54,9 @@ def main():
     # Where enemies live
     objects = []
 
-    #    score_counter = 0
+    # Initialize UI
     xp_bar = user_interface.ExperienceBar(p)
+    health_bar = user_interface.HealthBar(p)
 
     spawn_interval = random.randint(0, 1700)
     timer_started = False
@@ -113,7 +109,6 @@ def main():
                         timer_started = True
 
                     # check if player leveled up
-                    check_level(p)
 
                     current_time = pygame.time.get_ticks()
 
@@ -150,7 +145,7 @@ def main():
 
                     # Update logic
                     target = p.pos.center
-                    p.update(objects)
+                    # p.update(objects)
 
                     # Update bolts
                     p.bolts = [bolt for bolt in p.bolts if not bolt.update(objects)]
@@ -197,19 +192,8 @@ def main():
 
                     # Increment score
                     for o in objects:
-                        if o.health <= 0:
-                            if type(o) is EasyEnemy:
-                                p.score += 1
-                                p.current_xp += 1
-                            if type(o) is MediumEnemy:
-                                p.score += 3
-                                p.current_xp += 3
-                            if type(o) is HardEnemy:
-                                p.score += 5
-                                p.current_xp += 5
-                            if type(o) is SpecialEnemy:
-                                p.score += 10
-                                p.current_xp += 10
+                        got_xp = p.get_xp(o)
+                        if got_xp:
                             create_food = True
 
                     # Food chance
@@ -250,40 +234,7 @@ def main():
                         o.hitbox.center = o.rect.center
 
                     # health bar
-                    health_ratio = p.health / p.max_health
-                    current_health_width = health_bar_width * health_ratio
-
-                    pygame.draw.rect(
-                        screen,
-                        background_color,
-                        (
-                            health_bar_pos[0],
-                            health_bar_pos[1],
-                            health_bar_width,
-                            health_bar_height,
-                        ),
-                    )
-                    pygame.draw.rect(
-                        screen,
-                        health_color,
-                        (
-                            health_bar_pos[0],
-                            health_bar_pos[1],
-                            current_health_width,
-                            health_bar_height,
-                        ),
-                    )
-                    pygame.draw.rect(
-                        screen,
-                        (255, 255, 255),
-                        (
-                            health_bar_pos[0],
-                            health_bar_pos[1],
-                            health_bar_width,
-                            health_bar_height,
-                        ),
-                        2,
-                    )
+                    health_bar.draw(background)
 
                     p.draw(screen)
 

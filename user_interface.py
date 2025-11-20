@@ -2,6 +2,32 @@ import pygame
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
+class HealthBar:
+    def __init__(self, player):
+        self.player = player
+        self.health_bar_width = 200
+        self.health_bar_height = 20
+        self.bg_color = (255, 0, 0)
+        self.health_color = (0, 255, 0)
+        self.update()
+
+    def update(self):
+        health_ratio = self.player.health / self.player.max_health
+        current_health_width = self.health_bar_width * health_ratio
+        self.health_rect = pygame.Rect(
+            50, 35, self.health_bar_width, self.health_bar_height
+        )
+        self.current_health_rect = pygame.Rect(
+            50, 35, current_health_width, self.health_bar_height
+        )
+
+    def draw(self, screen):
+        self.update()
+        pygame.draw.rect(screen, self.bg_color, self.health_rect)
+        pygame.draw.rect(screen, self.health_color, self.current_health_rect)
+        pygame.draw.rect(screen, (255, 255, 255), self.health_rect, 2)
+
+
 class ExperienceBar:
     def __init__(self, player):
         self.player = player
@@ -34,11 +60,12 @@ class ExperienceBar:
         self.bar_rect.midtop = self.level_rect.midbottom
         self.bar_rect.y += self.bar_padding  # gap between text and bar
 
+        # XP calculation
+        current_xp = self.player.current_xp
+        xp_needed = self.player.get_xp_needed()
+
         # Current fill amount
-        if self.player.max_xp > 0:
-            self.fill_amount = self.player.current_xp / self.player.max_xp
-        else:
-            self.fill_amount = 0.0
+        self.fill_amount = max(0.0, min(1.0, current_xp / xp_needed))
 
         self.fill_rect = self.bar_rect.copy()
         self.fill_rect.width = int(self.bar_rect.width * self.fill_amount)

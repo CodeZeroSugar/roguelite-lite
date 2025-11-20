@@ -4,6 +4,7 @@ import os
 import random
 import animation
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_HEIGHT, SPRITE_WIDTH
+from functions import new_ability
 
 
 class Player:
@@ -61,8 +62,7 @@ class Player:
         self.current_anim = self.animations["idle"]
         self.is_attacking = False
         # Level tracking
-        self.level = 0
-        self.next_level = 1
+        self.level = 1
         self.current_xp = 0
         self.max_xp = 0
         # Obtained abilities
@@ -70,6 +70,34 @@ class Player:
         self.bolts = []
         self.axes = []
         self.flails = []
+
+    def get_xp_needed(self):
+        return int(self.level**1.5)
+
+    def get_xp(self, enemy):
+        if enemy.health <= 0:
+            if type(enemy) is EasyEnemy:
+                self.score += 1
+                self.current_xp += 1
+            if type(enemy) is MediumEnemy:
+                self.score += 3
+                self.current_xp += 3
+            if type(enemy) is HardEnemy:
+                self.score += 5
+                self.current_xp += 5
+            if type(enemy) is SpecialEnemy:
+                self.score += 10
+                self.current_xp += 10
+
+            xp_needed = self.get_xp_needed()
+            while self.current_xp >= xp_needed:
+                self.current_xp -= xp_needed
+                self.level += 1
+                if self.level % 5 == 0:
+                    new_ability(self)
+                xp_needed = self.get_xp_needed()
+
+            return True
 
     def move(self, up=False, down=False, left=False, right=False):
         if right:
@@ -165,12 +193,6 @@ class Player:
         self.pos.centery = max(
             player_radius, min(self.pos.centery, SCREEN_HEIGHT - player_radius)
         )
-        # Update xp
-        if self.level == self.next_level:
-            print("Current xp reset")
-            self.current_xp = 0
-            self.max_xp = (self.level + 1) ** 1.5 - self.score
-            self.next_level += 1
 
         # Attack trigger
         if keys[pygame.K_SPACE] and not self.is_attacking:

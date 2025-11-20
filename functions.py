@@ -19,22 +19,6 @@ def new_ability(player):
     player.grant_ability(chosen)
 
 
-def check_level(player):
-    current_level = player.level
-    next_level = current_level + 1
-    score_needed = next_level**1.5
-    if player.score >= score_needed:
-        player.level += 1
-        print(f"Player level up! Level is now: {player.level}")
-
-        if player.level % 5 == 0:
-            print("Time to pick a new ability!")
-            new_ability(player)
-
-        return True
-    return False
-
-
 def place_enemy(enemy):
     edge = random.choice(["top", "bottom", "left", "right"])
 
