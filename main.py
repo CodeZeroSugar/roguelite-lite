@@ -1,6 +1,7 @@
 import pygame
 import random
 import user_interface
+import sys
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from classes import Player
 from items import Food
@@ -20,7 +21,6 @@ def main():
 
     # initialize music
     music = pygame.mixer.Sound("./assets/music/pixelated_carnage_1.wav")
-    music.play(-1)
 
     running = True
     play_game = False
@@ -46,24 +46,22 @@ def main():
     # Initialize in game items
     food_objects = []
 
-    # Font for timer
-    font = pygame.font.SysFont("Arial", 36, bold=True)
-    remaining_sec = 0
-    remaining_ms = 0
-
     # Where enemies live
     objects = []
 
     # Initialize UI
     xp_bar = user_interface.ExperienceBar(p)
     health_bar = user_interface.HealthBar(p)
+    score = user_interface.Score(p)
+    timer = user_interface.Timer()
 
     spawn_interval = random.randint(0, 1700)
     timer_started = False
     start_time = 0
+    remaining_sec = 0
+    remaining_ms = 0
     last_spawn_time = 0
     ROUND_DURATION_MS = 600_000
-    # 600_000
 
     # Cooldown initialization
     damage_tick = 0
@@ -79,8 +77,9 @@ def main():
     while running:
         match state_input:
             case GameState.MENU:
+                music.play(-1)
                 # Title Screen
-                while True:
+                while running:
                     for event in pygame.event.get():
                         if (
                             event.type == pygame.KEYDOWN
@@ -92,8 +91,10 @@ def main():
                         if (
                             pygame.key.get_pressed()[pygame.K_q]
                             or pygame.key.get_pressed()[pygame.K_ESCAPE]
+                            or event.type == pygame.QUIT
                         ):
-                            pygame.quit()
+                            running = False
+                            break
                     screen.blit(title_background, (0, 0))
                     pygame.display.flip()
                     clock.tick(60)
@@ -101,14 +102,12 @@ def main():
                         break
 
             case GameState.PLAY:
-                while True:
+                while running:
                     # Start Timer
                     if not timer_started:
                         start_time = pygame.time.get_ticks()
                         last_spawn_time = start_time
                         timer_started = True
-
-                    # check if player leveled up
 
                     current_time = pygame.time.get_ticks()
 
@@ -145,7 +144,6 @@ def main():
 
                     # Update logic
                     target = p.pos.center
-                    # p.update(objects)
 
                     # Update bolts
                     p.bolts = [bolt for bolt in p.bolts if not bolt.update(objects)]
@@ -274,26 +272,10 @@ def main():
                         flail.draw(screen)
 
                     # Draw Timer
-                    minutes = remaining_sec // 60
-                    seconds = remaining_sec % 60
-                    timer_text = f"{minutes:02d}:{seconds:02d}"
-                    timer_surface = font.render(timer_text, True, (255, 255, 255))
-                    timer_rect = timer_surface.get_rect()
-                    timer_rect.topright = (SCREEN_WIDTH - 20, 20)
-                    screen.blit(timer_surface, timer_rect)
-                    bg_rect = timer_rect.inflate(20, 10)
-                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
-                    screen.blit(timer_surface, timer_rect)
+                    timer.draw(screen, remaining_sec)
 
                     # Draw Score score_counter
-                    score_text = f"Score: {p.score}"
-                    score_surface = font.render(score_text, True, (255, 255, 255))
-                    score_rect = score_surface.get_rect()
-                    score_rect.topright = (SCREEN_WIDTH - 140, 20)
-                    screen.blit(score_surface, score_rect)
-                    bg_score = score_rect.inflate(20, 10)
-                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_score)
-                    screen.blit(score_surface, score_rect)
+                    score.draw(screen)
 
                     # Draw player level
                     xp_bar.draw(screen)
@@ -323,8 +305,8 @@ def main():
 
             case GameState.LOSE:
                 play_game = False
-                # music.fadeout(2000)
-                while True:
+                music.fadeout(2000)
+                while running:
                     for event in pygame.event.get():
                         if (
                             event.type == pygame.KEYDOWN
@@ -336,31 +318,17 @@ def main():
                         if (
                             pygame.key.get_pressed()[pygame.K_q]
                             or pygame.key.get_pressed()[pygame.K_ESCAPE]
+                            or event.type == pygame.QUIT
                         ):
-                            pygame.quit()
+                            running = False
+                            break
 
                     screen.blit(death_screen, (0, 0))
                     # Draw Timer
-                    minutes = remaining_sec // 60
-                    seconds = remaining_sec % 60
-                    timer_text = f"{minutes:02d}:{seconds:02d}"
-                    timer_surface = font.render(timer_text, True, (255, 255, 255))
-                    timer_rect = timer_surface.get_rect()
-                    timer_rect.topright = (SCREEN_WIDTH - 20, 20)
-                    screen.blit(timer_surface, timer_rect)
-                    bg_rect = timer_rect.inflate(20, 10)
-                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
-                    screen.blit(timer_surface, timer_rect)
+                    timer.draw(screen, remaining_sec)
 
                     # Draw Score score_counter
-                    score_text = f"Score: {p.score}"
-                    score_surface = font.render(score_text, True, (255, 255, 255))
-                    score_rect = score_surface.get_rect()
-                    score_rect.topright = (SCREEN_WIDTH - 140, 20)
-                    screen.blit(score_surface, score_rect)
-                    bg_score = score_rect.inflate(20, 10)
-                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_score)
-                    screen.blit(score_surface, score_rect)
+                    score.draw(screen)
 
                     pygame.display.flip()
                     clock.tick(60)
@@ -369,8 +337,8 @@ def main():
 
             case GameState.WIN:
                 play_game = False
-                # music.fadeout(2000)
-                while True:
+                music.fadeout(2000)
+                while running:
                     for event in pygame.event.get():
                         if (
                             event.type == pygame.KEYDOWN
@@ -382,32 +350,18 @@ def main():
                         if (
                             pygame.key.get_pressed()[pygame.K_q]
                             or pygame.key.get_pressed()[pygame.K_ESCAPE]
+                            or event.type == pygame.QUIT
                         ):
-                            pygame.quit()
+                            running = False
+                            break
 
                     screen.blit(title_background, (0, 0))
 
                     # Draw Timer
-                    minutes = remaining_sec // 60
-                    seconds = remaining_sec % 60
-                    timer_text = f"{minutes:02d}:{seconds:02d}"
-                    timer_surface = font.render(timer_text, True, (255, 255, 255))
-                    timer_rect = timer_surface.get_rect()
-                    timer_rect.topright = (SCREEN_WIDTH - 20, 20)
-                    screen.blit(timer_surface, timer_rect)
-                    bg_rect = timer_rect.inflate(20, 10)
-                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
-                    screen.blit(timer_surface, timer_rect)
+                    timer.draw(screen, remaining_sec)
 
                     # Draw Score score_counter
-                    score_text = f"Score: {p.score}"
-                    score_surface = font.render(score_text, True, (255, 255, 255))
-                    score_rect = score_surface.get_rect()
-                    score_rect.topright = (SCREEN_WIDTH - 140, 20)
-                    screen.blit(score_surface, score_rect)
-                    bg_score = score_rect.inflate(20, 10)
-                    pygame.draw.rect(screen, (0, 0, 0, 180), bg_score)
-                    screen.blit(score_surface, score_rect)
+                    score.draw(screen)
 
                     pygame.display.flip()
                     clock.tick(60)
@@ -415,6 +369,7 @@ def main():
                         main()
 
     pygame.quit()
+    sys.exit()
 
 
 if __name__ == "__main__":

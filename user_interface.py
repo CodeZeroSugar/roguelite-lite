@@ -2,6 +2,48 @@ import pygame
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
+class Score:
+    def __init__(self, player):
+        self.player = player
+        self.font = pygame.font.SysFont("Arial", 36, bold=True)
+        self.text_color = (255, 255, 255)
+        self.update()
+
+    def update(self):
+        score_text = f"Score: {self.player.score}"
+        self.score_surface = self.font.render(score_text, True, self.text_color)
+        self.score_rect = self.score_surface.get_rect()
+        self.score_rect.topright = (SCREEN_WIDTH - 140, 20)
+
+    def draw(self, screen):
+        self.update()
+        screen.blit(self.score_surface, self.score_rect)
+        bg_rect = self.score_rect.inflate(20, 10)
+        pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
+        screen.blit(self.score_surface, self.score_rect)
+
+
+class Timer:
+    def __init__(self):
+        self.font = pygame.font.SysFont("Arial", 36, bold=True)
+        self.text_color = (255, 255, 255)
+
+    def update(self, rem_seconds):
+        minutes = rem_seconds // 60
+        seconds = rem_seconds % 60
+        timer_text = f"{minutes:02d}:{seconds:02d}"
+        self.timer_surface = self.font.render(timer_text, True, self.text_color)
+        self.timer_rect = self.timer_surface.get_rect()
+        self.timer_rect.topright = (SCREEN_WIDTH - 20, 20)
+
+    def draw(self, screen, seconds):
+        self.update(seconds)
+        screen.blit(self.timer_surface, self.timer_rect)
+        bg_rect = self.timer_rect.inflate(20, 10)
+        pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
+        screen.blit(self.timer_surface, self.timer_rect)
+
+
 class HealthBar:
     def __init__(self, player):
         self.player = player
