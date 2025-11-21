@@ -20,7 +20,7 @@ def main():
     clock = pygame.time.Clock()
 
     # initialize music
-    music = pygame.mixer.Sound("./assets/music/pixelated_carnage_1.wav")
+    # music = pygame.mixer.Sound("./assets/music/pixelated_carnage_1.wav")
 
     running = True
     play_game = False
@@ -50,9 +50,10 @@ def main():
     objects = []
 
     # Initialize UI
+    player_level = user_interface.PlayerLevel(p)
     xp_bar = user_interface.ExperienceBar(p)
     health_bar = user_interface.HealthBar(p)
-    score = user_interface.Score(p)
+    # score = user_interface.Score(p)
     timer = user_interface.Timer()
 
     spawn_interval = random.randint(0, 1700)
@@ -77,7 +78,7 @@ def main():
     while running:
         match state_input:
             case GameState.MENU:
-                music.play(-1)
+                # music.play(-1)
                 # Title Screen
                 while running:
                     for event in pygame.event.get():
@@ -231,8 +232,11 @@ def main():
                     for o in objects:
                         o.hitbox.center = o.rect.center
 
+                    # Draw player level
+                    xp_bar.draw(screen)
+
                     # health bar
-                    health_bar.draw(background)
+                    health_bar.draw(screen)
 
                     p.draw(screen)
 
@@ -274,11 +278,11 @@ def main():
                     # Draw Timer
                     timer.draw(screen, remaining_sec)
 
-                    # Draw Score score_counter
-                    score.draw(screen)
+                    # draw PlayerLevel
+                    player_level.draw(screen)
 
-                    # Draw player level
-                    xp_bar.draw(screen)
+                    # Draw Score score_counter
+                    # score.draw(screen)
 
                     # Cooldowns
                     create_food = False
@@ -305,7 +309,7 @@ def main():
 
             case GameState.LOSE:
                 play_game = False
-                music.fadeout(2000)
+                # music.fadeout(2000)
                 while running:
                     for event in pygame.event.get():
                         if (
@@ -328,7 +332,7 @@ def main():
                     timer.draw(screen, remaining_sec)
 
                     # Draw Score score_counter
-                    score.draw(screen)
+                    # score.draw(screen)
 
                     pygame.display.flip()
                     clock.tick(60)
@@ -337,7 +341,7 @@ def main():
 
             case GameState.WIN:
                 play_game = False
-                music.fadeout(2000)
+                # music.fadeout(2000)
                 while running:
                     for event in pygame.event.get():
                         if (
@@ -361,7 +365,7 @@ def main():
                     timer.draw(screen, remaining_sec)
 
                     # Draw Score score_counter
-                    score.draw(screen)
+                    # score.draw(screen)
 
                     pygame.display.flip()
                     clock.tick(60)

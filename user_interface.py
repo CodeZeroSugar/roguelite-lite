@@ -1,11 +1,11 @@
 import pygame
-from constants import SCREEN_HEIGHT, SCREEN_WIDTH
+from constants import SCREEN_WIDTH
 
 
 class Score:
     def __init__(self, player):
         self.player = player
-        self.font = pygame.font.SysFont("Arial", 36, bold=True)
+        self.font = pygame.font.Font("./assets/fonts/PublicPixel-rv0pA.ttf", 36)
         self.text_color = (255, 255, 255)
         self.update()
 
@@ -25,7 +25,11 @@ class Score:
 
 class Timer:
     def __init__(self):
-        self.font = pygame.font.SysFont("Arial", 36, bold=True)
+        self.image = pygame.image.load(
+            "./assets/images/user-interface/time.png"
+        ).convert_alpha()
+        self.image_rect = self.image.get_rect()
+        self.font = pygame.font.Font("./assets/fonts/PublicPixel-rv0pA.ttf", 24)
         self.text_color = (255, 255, 255)
 
     def update(self, rem_seconds):
@@ -34,21 +38,25 @@ class Timer:
         timer_text = f"{minutes:02d}:{seconds:02d}"
         self.timer_surface = self.font.render(timer_text, True, self.text_color)
         self.timer_rect = self.timer_surface.get_rect()
-        self.timer_rect.topright = (SCREEN_WIDTH - 20, 20)
+        self.timer_rect.topright = (SCREEN_WIDTH - 25, 28)
+        self.image_rect.midtop = (SCREEN_WIDTH - 20, -42)
 
     def draw(self, screen, seconds):
         self.update(seconds)
-        screen.blit(self.timer_surface, self.timer_rect)
-        bg_rect = self.timer_rect.inflate(20, 10)
-        pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect)
+        screen.blit(self.image, self.image_rect)
         screen.blit(self.timer_surface, self.timer_rect)
 
 
 class HealthBar:
     def __init__(self, player):
         self.player = player
-        self.health_bar_width = 200
-        self.health_bar_height = 20
+        self.image = pygame.image.load(
+            "./assets/images/user-interface/Heart_Bar_3.png"
+        ).convert_alpha()
+        self.image_rect = self.image.get_rect()
+        self.health_bar_width = 282
+        self.health_bar_height = 22
+        self.pos = (78, 30)
         self.bg_color = (255, 0, 0)
         self.health_color = (0, 255, 0)
         self.update()
@@ -57,49 +65,57 @@ class HealthBar:
         health_ratio = self.player.health / self.player.max_health
         current_health_width = self.health_bar_width * health_ratio
         self.health_rect = pygame.Rect(
-            50, 35, self.health_bar_width, self.health_bar_height
+            self.pos[0], self.pos[1], self.health_bar_width, self.health_bar_height
         )
         self.current_health_rect = pygame.Rect(
-            50, 35, current_health_width, self.health_bar_height
+            self.pos[0], self.pos[1], current_health_width, self.health_bar_height
         )
+        self.image_rect.midtop = (190, 0)
 
     def draw(self, screen):
         self.update()
         pygame.draw.rect(screen, self.bg_color, self.health_rect)
         pygame.draw.rect(screen, self.health_color, self.current_health_rect)
-        pygame.draw.rect(screen, (255, 255, 255), self.health_rect, 2)
+        screen.blit(self.image, self.image_rect)
+
+
+class PlayerLevel:
+    def __init__(self, player):
+        self.player = player
+        self.font = pygame.font.Font("./assets/fonts/PublicPixel-rv0pA.ttf", 24)
+        self.text_color = (255, 255, 255)
+        self.update()
+
+    def update(self):
+        self.text = str(self.player.level)
+        self.level_surface = self.font.render(self.text, True, self.text_color)
+        self.level_rect = self.level_surface.get_rect()
+        self.level_rect.topright = (52, 22)
+
+    def draw(self, screen):
+        self.update()
+        screen.blit(self.level_surface, self.level_rect)
 
 
 class ExperienceBar:
     def __init__(self, player):
         self.player = player
-        self.font = pygame.font.SysFont("Arial", 36, bold=True)
-        self.text_color = (255, 255, 255)
 
         # Bar appearance
-        self.bar_width = 300
-        self.bar_height = 26
+        self.bar_width = 280
+        self.bar_height = 16
         self.bar_padding = 12  # space between level text and bar
         self.bg_color = (30, 30, 50, 180)
         self.fill_color = (0, 200, 255)
         self.border_color = (100, 200, 255)
-        self.border_radius = 13
+        self.border_radius = 6
 
-        self.level_surface = None
-        self.level_rect = None
         self.update()
 
     def update(self):
-        # Level text
-        text = str(self.player.level)
-        self.level_surface = self.font.render(text, True, self.text_color)
-        self.level_rect = self.level_surface.get_rect(
-            center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 65)
-        )
-
         # XP bar
-        self.bar_rect = pygame.Rect(0, 0, self.bar_width, self.bar_height)
-        self.bar_rect.midtop = self.level_rect.midbottom
+        self.bar_rect = pygame.Rect(78, 50, self.bar_width, self.bar_height)
+        # self.bar_rect.midtop = self.level_rect.midbottom
         self.bar_rect.y += self.bar_padding  # gap between text and bar
 
         # XP calculation
@@ -115,16 +131,9 @@ class ExperienceBar:
     def draw(self, screen):
         self.update()
 
-        # 1. XP bar background + border
+        # 1. XP bar background
         pygame.draw.rect(
             screen, self.bg_color, self.bar_rect, border_radius=self.border_radius
-        )
-        pygame.draw.rect(
-            screen,
-            self.border_color,
-            self.bar_rect,
-            width=3,
-            border_radius=self.border_radius,
         )
 
         # 2. XP fill
@@ -137,4 +146,4 @@ class ExperienceBar:
             )
 
         # 3. Level number on top
-        screen.blit(self.level_surface, self.level_rect)
+        # screen.blit(self.level_surface, self.level_rect)
