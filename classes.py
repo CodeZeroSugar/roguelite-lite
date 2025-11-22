@@ -62,7 +62,7 @@ class Player:
         self.current_anim = self.animations["idle"]
         self.is_attacking = False
         # Level tracking
-        self.level = 1
+        self.level = 9
         self.current_xp = 0
         self.max_xp = 0
         # Obtained abilities

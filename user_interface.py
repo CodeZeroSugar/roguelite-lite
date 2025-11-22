@@ -88,9 +88,15 @@ class PlayerLevel:
 
     def update(self):
         self.text = str(self.player.level)
-        self.level_surface = self.font.render(self.text, True, self.text_color)
-        self.level_rect = self.level_surface.get_rect()
-        self.level_rect.topright = (52, 22)
+        if self.player.level >= 10:
+            self.font = pygame.font.Font("./assets/fonts/PublicPixel-rv0pA.ttf", 16)
+            self.level_surface = self.font.render(self.text, True, self.text_color)
+            self.level_rect = self.level_surface.get_rect()
+            self.level_rect.topright = (52, 26)
+        else:
+            self.level_surface = self.font.render(self.text, True, self.text_color)
+            self.level_rect = self.level_surface.get_rect()
+            self.level_rect.topright = (52, 22)
 
     def draw(self, screen):
         self.update()

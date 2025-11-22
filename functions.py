@@ -15,7 +15,7 @@ def new_ability(player):
         print("No new abilities available")
         return
 
-    chosen = random.choice(options)
+    chosen = random.choice(available)
     player.grant_ability(chosen)
 
 
