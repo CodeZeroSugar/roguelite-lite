@@ -10,7 +10,7 @@ from game_state import GameState
 
 
 def main():
-    print("Starting Roguelite-lite!")
+    print("Starting Orc Slayer!")
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
@@ -30,6 +30,9 @@ def main():
     ).convert()
     death_screen = pygame.image.load(
         "./assets/images/backgrounds/death_screen.png"
+    ).convert()
+    victory_screen = pygame.image.load(
+        "./assets/images/backgrounds/victory_screen.png"
     ).convert()
 
     player = pygame.image.load("./assets/images/player.png").convert_alpha()
@@ -118,7 +121,6 @@ def main():
                     remaining_sec = remaining_ms // 1000
                     # Round lasts 10 minutes
                     if remaining_ms <= 0:
-                        print("Round over!")
                         state_input = GameState.WIN
                         break
                     # Spawn logic
@@ -197,17 +199,13 @@ def main():
 
                     # Food chance
                     if create_food is True:
-                        print("Attempting to spawn food")
                         if random.randrange(0, 101) <= 10:
-                            print("creating food!")
                             food_objects.append(Food())
-                            print(f"Number of food on screen: {len(food_objects)}")
                             create_food = False
 
                     # Player eats food
                     for food in food_objects:
                         if food.food_rect.colliderect(p.hitbox):
-                            print("Food Eaten")
                             food.get_eaten(p)
 
                     food_objects = [
@@ -221,7 +219,6 @@ def main():
 
                     # Check if dead
                     if p.health <= 0:
-                        print("You died!")
                         state_input = GameState.LOSE
 
                         break
@@ -359,7 +356,7 @@ def main():
                             running = False
                             break
 
-                    screen.blit(title_background, (0, 0))
+                    screen.blit(victory_screen, (0, 0))
 
                     # Draw Timer
                     timer.draw(screen, remaining_sec)

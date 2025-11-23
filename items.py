@@ -17,8 +17,6 @@ class Food:
         lost_health = player.max_health - player.health
         if self.health_amount > lost_health:
             player.health += lost_health
-            print("Player healed to full")
 
         else:
             player.health += self.health_amount
-            print("Player healed 5 points")

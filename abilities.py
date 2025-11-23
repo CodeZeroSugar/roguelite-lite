@@ -58,8 +58,6 @@ class AutomaticCrossbow(Ability):
         # Add to bolt list
         player.bolts.append(bolt)
 
-        print(f"Crossbow hit {closest.__class__.__name__} at {closest.rect.center}")
-
 
 class ThrowingAxes(Ability):
     def __init__(self):

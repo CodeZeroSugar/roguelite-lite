@@ -62,7 +62,7 @@ class Player:
         self.current_anim = self.animations["idle"]
         self.is_attacking = False
         # Level tracking
-        self.level = 9
+        self.level = 1
         self.current_xp = 0
         self.max_xp = 0
         # Obtained abilities
@@ -120,9 +120,6 @@ class Player:
     def take_damage(self, damage=1):
         if self.health > 0:
             self.health -= damage
-            print(f"Player health is {self.health}")
-        else:
-            print("Player health is 0!")
 
     def basic_attack(self, surface):
         if not self.arc_active:
@@ -272,7 +269,6 @@ class Player:
         if any(ab.name == new_ability.name for ab in self.abilities):
             return
         self.abilities.append(new_ability)
-        print(f"Granted {new_ability.name!r}")
 
 
 class Enemy:
@@ -298,9 +294,6 @@ class Enemy:
     def take_damage(self, damage=2):
         if self.health > 0:
             self.health -= damage
-            print(f"Enemy health is {self.health}")
-        else:
-            print("Enemy health is 0!")
 
 
 class EasyEnemy(Enemy):

@@ -12,7 +12,6 @@ def new_ability(player):
         if not any(ab.name == cls().name for ab in player.abilities)
     ]
     if not available:
-        print("No new abilities available")
         return
 
     chosen = random.choice(available)
