@@ -21,7 +21,7 @@ Hopefully my effort keeps you entertained for at least the duration of the 10 mi
    git clone https://github.com/CodeZeroSugar/orc-slayer.git
    cd orc-slayer
    ```
-2. **Create and activate a virutal environment** (Recommended)
+2. **Create and activate a virtual environment** (Recommended)
    ```bash
    python -m venv .venv
    # Windows:
@@ -42,4 +42,5 @@ Hopefully my effort keeps you entertained for at least the duration of the 10 mi
    ```bash
    deactivate
    ```
+
 
